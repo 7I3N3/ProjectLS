@@ -9,7 +9,8 @@ public class ProjectLSEditorTarget : TargetRules
 	{
 		Type = TargetType.Editor;
 		DefaultBuildSettings = BuildSettingsVersion.V5;
+        IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_5;
 
-		ExtraModuleNames.AddRange( new string[] { "ProjectLS", "InputModule" } );
+        ExtraModuleNames.AddRange( new string[] { "ProjectLS", "InputModule" } );
 	}
 }
