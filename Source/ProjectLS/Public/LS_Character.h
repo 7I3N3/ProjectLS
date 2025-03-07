@@ -12,6 +12,9 @@ class UInputConfigComponent;
 class UMoveInputComponent;
 class ULookInputComponent;
 class UJumpInputComponent;
+class UInteractInputComponent;
+class UPrimaryAttackInputComponent;
+class UAlternativeAttackInputComponent;
 
 UCLASS()
 class PROJECTLS_API ALS_Character : public ACharacter
@@ -33,6 +36,12 @@ private:
 	ULookInputComponent* LookInput;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UJumpInputComponent* JumpInput;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInteractInputComponent* InteractInput;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UPrimaryAttackInputComponent* PrimaryAttackInput;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UAlternativeAttackInputComponent* AlternativeAttackInput;
 
 protected:
 

@@ -19,7 +19,14 @@ private:
 
 
 protected:
-
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Move", meta = (AllowPrivateAccess = "true"))
+	float BaseSpeed = 700.0f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Move", meta = (AllowPrivateAccess = "true"))
+	float MinSpeedMultiplier = 0.3f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Move", meta = (AllowPrivateAccess = "true"))
+	float MaxSpeedMultiplier = 1.0f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Move", meta = (AllowPrivateAccess = "true"))
+	float InterpExponent = 2.0f;
 
 public:
 
@@ -28,7 +35,6 @@ public:
 
 #pragma region Functions
 private:
-
 
 protected:
 	virtual void BeginPlay() override;

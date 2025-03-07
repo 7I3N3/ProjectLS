@@ -12,6 +12,9 @@
 #include "InputModule/Private/MoveInputComponent.h"
 #include "InputModule/Private/LookInputComponent.h"
 #include "InputModule/Private/JumpInputComponent.h"
+#include "InputModule/Private/InteractInputComponent.h"
+#include "InputModule/Private/PrimaryAttackInputComponent.h"
+#include "InputModule/Private/AlternativeAttackInputComponent.h"
 
 ALS_Character::ALS_Character()
 {
@@ -45,6 +48,9 @@ ALS_Character::ALS_Character()
 	MoveInput = CreateDefaultSubobject<UMoveInputComponent>(TEXT("MoveInput"));
 	LookInput = CreateDefaultSubobject<ULookInputComponent>(TEXT("LookInput"));
 	JumpInput = CreateDefaultSubobject<UJumpInputComponent>(TEXT("JumpInput"));
+	InteractInput = CreateDefaultSubobject<UInteractInputComponent>(TEXT("InteractInput"));
+	PrimaryAttackInput = CreateDefaultSubobject<UPrimaryAttackInputComponent>(TEXT("PrimaryAttackInput"));
+	AlternativeAttackInput = CreateDefaultSubobject<UAlternativeAttackInputComponent>(TEXT("AlternativeAttackInput"));
 }
 
 void ALS_Character::BeginPlay()

@@ -5,6 +5,7 @@
 #include "EnhancedInputComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/Controller.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 UMoveInputComponent::UMoveInputComponent()
 {
@@ -43,8 +44,17 @@ void UMoveInputComponent::Move(const FInputActionValue& Value)
 
 			const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
-			Character->AddMovementInput(ForwardDirection, MovementVector.Y);
-			Character->AddMovementInput(RightDirection, MovementVector.X);
+			FVector MoveDirection = (ForwardDirection * MovementVector.Y) + (RightDirection * MovementVector.X);
+			MoveDirection.Normalize();
+
+			const FVector VelocityDirection = Character->GetCharacterMovement()->Velocity.GetSafeNormal();
+
+			const float DotProduct = FVector::DotProduct(ForwardDirection, VelocityDirection);
+			const float SpeedMultiplier = FMath::Lerp(MinSpeedMultiplier, MaxSpeedMultiplier, FMath::Pow((DotProduct + 1) / 2, InterpExponent));
+
+			Character->GetCharacterMovement()->MaxWalkSpeed = BaseSpeed * SpeedMultiplier;
+
+			Character->AddMovementInput(MoveDirection);
 		}
 	}
 }
