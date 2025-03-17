@@ -6,7 +6,6 @@
 #include "BaseInputComponent.h"
 #include "PrimaryAttackInputComponent.generated.h"
 
-struct FInputActionValue;
 class UEnhancedInputComponent;
 
 UCLASS(ClassGroup = (InputModule), meta = (BlueprintSpawnableComponent))

@@ -4,10 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "LS_BaseItem.h"
 #include "LS_Character.generated.h"
 
 class USpringArmComponent;
 class UCameraComponent;
+
 class UInputConfigComponent;
 class UMoveInputComponent;
 class ULookInputComponent;
@@ -15,6 +17,10 @@ class UJumpInputComponent;
 class UInteractInputComponent;
 class UPrimaryAttackInputComponent;
 class UAlternativeAttackInputComponent;
+
+class ALS_BaseItem;
+
+class UAbilitySystemComponent;
 
 UCLASS()
 class PROJECTLS_API ALS_Character : public ACharacter
@@ -43,8 +49,14 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UAlternativeAttackInputComponent* AlternativeAttackInput;
 
-protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Abilities", meta = (AllowPrivateAccess = "true"))
+	UAbilitySystemComponent* AbilitySystemComponent;
 
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Interact", meta = (AllowPrivateAccess = "true"))
+	float InteractDistance = 500.0f;
+
+	AActor* CurrentInteract;
 
 public:
 
@@ -60,13 +72,26 @@ protected:
 
 	virtual void NotifyControllerChanged() override; 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	void CheckInteract();
+
 public:
 	ALS_Character();
+
+	virtual void Tick(float DeltaTime) override;
+
+	void EquipItem(ALS_BaseItem* Item);
+	bool IsItemEquipped(EEquipmentSlot Slot) const;
 
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
 	FORCEINLINE class UInputConfigComponent* GetInputConfig() const { return InputConfig; }
+
+	FORCEINLINE float GetInteractDistance() const { return InteractDistance; }
+	FORCEINLINE AActor* GetCurrentInteract() const { return CurrentInteract; }
+
+	FORCEINLINE UAbilitySystemComponent* GetAbilitySystemComponent() const { return AbilitySystemComponent; }
 
 #pragma endregion Functions
 };

@@ -15,9 +15,16 @@
 #include "InputModule/Private/InteractInputComponent.h"
 #include "InputModule/Private/PrimaryAttackInputComponent.h"
 #include "InputModule/Private/AlternativeAttackInputComponent.h"
+#include "LS_Interactable.h"
+#include "LS_BaseItem.h"
+#include "AbilitySystemComponent.h"
+#include "LS_GA_EquipAbility.h"
+#include "LS_EnumUtils.h"
 
 ALS_Character::ALS_Character()
 {
+	PrimaryActorTick.bCanEverTick = true;
+
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
 	bUseControllerRotationPitch = false;
@@ -57,6 +64,68 @@ void ALS_Character::BeginPlay()
 {
 	Super::BeginPlay();
 	
+}
+
+void ALS_Character::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	CheckInteract();
+}
+
+void ALS_Character::CheckInteract()
+{
+	FVector Start = FollowCamera->GetComponentLocation();
+	FVector Foward = FollowCamera->GetForwardVector();
+	FVector End = Start + (Foward * InteractDistance);
+
+	FHitResult HitResult;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+
+	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, Params);
+
+	if (bHit)
+	{
+		AActor* HitActor = HitResult.GetActor();
+		if (HitActor && HitActor->Implements<ULS_Interactable>())
+		{
+			if (CurrentInteract != HitActor)
+			{
+				CurrentInteract = HitActor;
+			}
+
+			if (ILS_Interactable* Interactable = Cast<ILS_Interactable>(CurrentInteract))
+			{
+				Interactable->ShowInteractionUI();
+			}
+			return;
+		}
+	}
+
+	if (CurrentInteract)
+	{
+		if (ILS_Interactable* Interactable = Cast<ILS_Interactable>(CurrentInteract))
+		{
+			Interactable->HideInteractionUI();
+		}
+		CurrentInteract = nullptr;
+	}
+}
+
+void ALS_Character::EquipItem(ALS_BaseItem* Item)
+{
+	if (Item && AbilitySystemComponent)
+	{
+		FGameplayEventData EventData;
+		EventData.Target = Item;
+
+		AbilitySystemComponent->TryActivateAbilityByClass(ULS_GA_EquipAbility::StaticClass(), &EventData != nullptr);
+	}
+}
+bool ALS_Character::IsItemEquipped(EEquipmentSlot Slot) const
+{
+	FName Tag = FName(TEXT("State.Equipped.") + EnumToString(Slot));
+	return AbilitySystemComponent->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(Tag));
 }
 
 void ALS_Character::NotifyControllerChanged()

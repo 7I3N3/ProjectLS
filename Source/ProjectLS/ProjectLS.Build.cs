@@ -8,9 +8,23 @@ public class ProjectLS : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "InputModule" });
+		PublicDependencyModuleNames.AddRange(new string[] 
+        { 
+            "Core", 
+            "CoreUObject", 
+            "Engine", 
+            "InputCore", 
+            "EnhancedInput", 
+            "InputModule" 
+        });
 
-		PrivateDependencyModuleNames.AddRange(new string[] { "InputModule" });
+		PrivateDependencyModuleNames.AddRange(new string[] 
+        { 
+            "InputModule",
+            "GameplayAbilities",
+            "GameplayTags",
+            "GameplayTasks"
+        });
 
 		PublicIncludePaths.AddRange(new string[]
 		{
