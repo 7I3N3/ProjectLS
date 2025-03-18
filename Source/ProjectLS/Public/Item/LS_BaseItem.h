@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "GameplayTagContainer.h"
+#include "LS_Interactable.h"
 #include "LS_BaseItem.generated.h"
 
 UENUM(BlueprintType)
@@ -22,7 +23,7 @@ enum class EEquipmentSlot : uint8
 };
 
 UCLASS()
-class PROJECTLS_API ALS_BaseItem : public AActor
+class PROJECTLS_API ALS_BaseItem : public AActor, public ILS_Interactable
 {
 	GENERATED_BODY()
 
@@ -43,13 +44,15 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Item", meta = (AllowPrivateAccess = "true"))
 	FGameplayTag EquipTag;
 
+	bool bIsUIVisible;
+
 public:
 
 #pragma endregion Parameters
 
 #pragma region Functions
 private:
-
+	
 
 protected:
 	virtual void BeginPlay() override;
@@ -57,6 +60,10 @@ protected:
 
 public:
 	ALS_BaseItem();
+
+	virtual void Interact(AActor* Interactor) override;
+	virtual void ShowInteractionUI() override;
+	virtual void HideInteractionUI() override;
 
 	FORCEINLINE EEquipmentSlot GetEquipmentSlot() const { return EquipmentSlot; }
 	FORCEINLINE FGameplayTag GetEquipTag() const { return EquipTag; }

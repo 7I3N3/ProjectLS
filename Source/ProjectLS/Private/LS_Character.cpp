@@ -15,8 +15,8 @@
 #include "InputModule/Private/InteractInputComponent.h"
 #include "InputModule/Private/PrimaryAttackInputComponent.h"
 #include "InputModule/Private/AlternativeAttackInputComponent.h"
-#include "LS_Interactable.h"
 #include "LS_BaseItem.h"
+#include "LS_Interactable.h"
 #include "AbilitySystemComponent.h"
 #include "LS_GA_EquipAbility.h"
 #include "LS_EnumUtils.h"
@@ -64,6 +64,7 @@ void ALS_Character::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	CurrentInteract = nullptr;
 }
 
 void ALS_Character::Tick(float DeltaTime)
@@ -98,6 +99,8 @@ void ALS_Character::CheckInteract()
 			{
 				Interactable->ShowInteractionUI();
 			}
+
+			DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 0.1f, 0, 0.5f);
 			return;
 		}
 	}
@@ -110,6 +113,8 @@ void ALS_Character::CheckInteract()
 		}
 		CurrentInteract = nullptr;
 	}
+
+	DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 0.1f, 0, 0.5f);
 }
 
 void ALS_Character::EquipItem(ALS_BaseItem* Item)

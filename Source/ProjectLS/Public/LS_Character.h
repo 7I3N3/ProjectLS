@@ -56,10 +56,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Interact", meta = (AllowPrivateAccess = "true"))
 	float InteractDistance = 500.0f;
 
-	AActor* CurrentInteract;
-
 public:
-
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interact")
+	AActor* CurrentInteract;
 
 #pragma endregion Parameters
 
@@ -88,10 +87,10 @@ public:
 
 	FORCEINLINE class UInputConfigComponent* GetInputConfig() const { return InputConfig; }
 
+	FORCEINLINE UAbilitySystemComponent* GetAbilitySystemComponent() const { return AbilitySystemComponent; }
+
 	FORCEINLINE float GetInteractDistance() const { return InteractDistance; }
 	FORCEINLINE AActor* GetCurrentInteract() const { return CurrentInteract; }
-
-	FORCEINLINE UAbilitySystemComponent* GetAbilitySystemComponent() const { return AbilitySystemComponent; }
 
 #pragma endregion Functions
 };

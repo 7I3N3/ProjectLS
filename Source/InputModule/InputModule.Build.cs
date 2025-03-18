@@ -8,9 +8,9 @@ public class InputModule : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "ProjectLS" });
 
-		PrivateDependencyModuleNames.AddRange(new string[] { "EnhancedInput" });
+		PrivateDependencyModuleNames.AddRange(new string[] { "EnhancedInput", "ProjectLS" });
 
 		PublicIncludePaths.AddRange(new string[] { "InputModule/Public" });
 		PrivateIncludePaths.AddRange(new string[] { "InputModule/Private" });

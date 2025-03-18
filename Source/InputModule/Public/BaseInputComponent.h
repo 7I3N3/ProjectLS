@@ -37,6 +37,8 @@ protected:
 public:
 	UBaseInputComponent();
 
+	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
 	virtual void BindInput(UEnhancedInputComponent* InputComponent) PURE_VIRTUAL(UBaseInputComponent::BindInput, );
 
 #pragma endregion Functions
