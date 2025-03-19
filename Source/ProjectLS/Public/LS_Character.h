@@ -56,9 +56,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Interact", meta = (AllowPrivateAccess = "true"))
 	float InteractDistance = 500.0f;
 
-public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interact")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interact", meta = (AllowPrivateAccess = "true"))
 	AActor* CurrentInteract;
+
+public:
+	
 
 #pragma endregion Parameters
 

@@ -31,21 +31,18 @@ void UInteractInputComponent::Interact()
 	ALS_Character* Character = Cast<ALS_Character>(GetOwner());
 	if (!Character)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Character is nullptr"));
 		return;
 	}
 
-	AActor* CurrentInteract = Character->CurrentInteract;
-	if (CurrentInteract)
+	AActor* CurrentInteract = Character->GetCurrentInteract();
+	if (!CurrentInteract)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("No interactable actor found"));
 		return;
 	}
 
 	ILS_Interactable* Interactable = Cast<ILS_Interactable>(CurrentInteract);
 	if (!Interactable)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Actor does not implement ILS_Interactable"));
 		return;
 	}
 
