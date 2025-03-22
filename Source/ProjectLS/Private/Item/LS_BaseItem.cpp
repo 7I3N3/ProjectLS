@@ -7,6 +7,9 @@ ALS_BaseItem::ALS_BaseItem()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
+	ItemMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ItemMesh"));
+	SetRootComponent(ItemMesh);
+
 	bIsUIVisible = false;
 }
 
@@ -30,6 +33,23 @@ void ALS_BaseItem::HideInteractionUI()
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("Interaction Lost"));
 		bIsUIVisible = false;
+	}
+}
+
+void ALS_BaseItem::DisableCollision()
+{
+	if (ItemMesh)
+	{
+		ItemMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
+	}
+}
+
+void ALS_BaseItem::EnableCollision()
+{
+	if (ItemMesh)
+	{
+		ItemMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		ItemMesh->SetCollisionResponseToAllChannels(ECR_Block);
 	}
 }
 

@@ -39,6 +39,9 @@ protected:
 	FText ItemName;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Item", meta = (AllowPrivateAccess = "true"))
+	UStaticMeshComponent* ItemMesh;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Item", meta = (AllowPrivateAccess = "true"))
 	EEquipmentSlot EquipmentSlot;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Item", meta = (AllowPrivateAccess = "true"))
@@ -64,6 +67,9 @@ public:
 	virtual void Interact(AActor* Interactor) override;
 	virtual void ShowInteractionUI() override;
 	virtual void HideInteractionUI() override;
+
+	void EnableCollision();
+	void DisableCollision();
 
 	FORCEINLINE EEquipmentSlot GetEquipmentSlot() const { return EquipmentSlot; }
 	FORCEINLINE FGameplayTag GetEquipTag() const { return EquipTag; }

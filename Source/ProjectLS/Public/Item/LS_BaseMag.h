@@ -18,12 +18,13 @@ private:
 
 
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Item", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mag", meta = (AllowPrivateAccess = "true"))
 	TArray<TSubclassOf<ALS_BaseBullet>> AvailableBullets;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Item", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mag", meta = (AllowPrivateAccess = "true"))
 	int32 MaxAmmo;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Mag", meta = (AllowPrivateAccess = "true"))
 	TArray<TSubclassOf<ALS_BaseBullet>> AmmoStack;
 
 public:
@@ -42,6 +43,7 @@ public:
 	ALS_BaseMag();
 
 	TSubclassOf<ALS_BaseBullet> ConsumeBullet();			// ¹ß»ç
+	UFUNCTION(BlueprintCallable)
 	bool LoadMag(TSubclassOf<ALS_BaseBullet> Bullet);		// »ðÅº
 
 	FORCEINLINE TArray<TSubclassOf<ALS_BaseBullet>> GetAvailableBullets() { return AvailableBullets; }

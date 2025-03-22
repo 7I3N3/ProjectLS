@@ -25,6 +25,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Gun", meta = (AllowPrivateAccess = "true"))
 	USceneComponent* DefaultMuzzleLocation;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Gun", meta = (AllowPrivateAccess = "true"))
 	TMap<FName, ALS_GunAttachment*> Attachments;
 
 public:
@@ -42,10 +43,16 @@ protected:
 public:
 	ALS_BaseGun();
 
+	UFUNCTION(BlueprintCallable)
 	void AddAttachment(ALS_GunAttachment* Attachment);
+	UFUNCTION(BlueprintCallable)
 	void RemoveAttachment(FName AttachmentSlot);
 
 	bool Fire();
+
+	virtual void Interact(AActor* Interactor) override;
+	virtual void ShowInteractionUI() override;
+	virtual void HideInteractionUI() override;
 
 	ALS_GunAttachment* GetAttachment(FName AttachmentSlot) const;
 

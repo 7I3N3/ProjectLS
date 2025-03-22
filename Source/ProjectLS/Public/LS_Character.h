@@ -19,6 +19,7 @@ class UPrimaryAttackInputComponent;
 class UAlternativeAttackInputComponent;
 
 class ALS_BaseItem;
+class ALS_BaseGun;
 
 class UAbilitySystemComponent;
 
@@ -59,6 +60,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interact", meta = (AllowPrivateAccess = "true"))
 	AActor* CurrentInteract;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Equip", meta = (AllowPrivateAccess = "true"))
+	TMap<EEquipmentSlot, ALS_BaseItem*> EquippedItems;
+
 public:
 	
 
@@ -81,7 +85,13 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION(BlueprintCallable, Category = "Equipment")
 	void EquipItem(ALS_BaseItem* Item);
+	UFUNCTION(BlueprintCallable, Category = "Equipment")
+	void UnequipItem(ALS_BaseItem* Item);
+	UFUNCTION(BlueprintCallable, Category = "Equipment")
+	ALS_BaseItem* GetEquippedItem(EEquipmentSlot Slot) const;
+	UFUNCTION(BlueprintCallable, Category = "Equipment")
 	bool IsItemEquipped(EEquipmentSlot Slot) const;
 
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }

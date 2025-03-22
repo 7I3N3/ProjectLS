@@ -41,5 +41,7 @@ bool ALS_BaseMag::LoadMag(TSubclassOf<ALS_BaseBullet> Bullet)
 	}
 
 	AmmoStack.Push(Bullet);
+
+	UE_LOG(LogTemp, Log, TEXT("Ammo Loaded: %s"), *Bullet->GetName());
 	return true;
 }

@@ -58,6 +58,8 @@ ALS_Character::ALS_Character()
 	InteractInput = CreateDefaultSubobject<UInteractInputComponent>(TEXT("InteractInput"));
 	PrimaryAttackInput = CreateDefaultSubobject<UPrimaryAttackInputComponent>(TEXT("PrimaryAttackInput"));
 	AlternativeAttackInput = CreateDefaultSubobject<UAlternativeAttackInputComponent>(TEXT("AlternativeAttackInput"));
+
+	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 }
 
 void ALS_Character::BeginPlay()
@@ -99,8 +101,6 @@ void ALS_Character::CheckInteract()
 			{
 				Interactable->ShowInteractionUI();
 			}
-
-			DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 0.1f, 0, 0.5f);
 			return;
 		}
 	}
@@ -113,24 +113,58 @@ void ALS_Character::CheckInteract()
 		}
 		CurrentInteract = nullptr;
 	}
-
-	DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 0.1f, 0, 0.5f);
 }
 
 void ALS_Character::EquipItem(ALS_BaseItem* Item)
 {
-	if (Item && AbilitySystemComponent)
-	{
-		FGameplayEventData EventData;
-		EventData.Target = Item;
+	if (!Item || !AbilitySystemComponent) return;
 
-		AbilitySystemComponent->TryActivateAbilityByClass(ULS_GA_EquipAbility::StaticClass(), &EventData != nullptr);
+	FGameplayTag EquipTag = Item->GetEquipTag();
+	if (EquipTag.IsValid())
+	{
+		AbilitySystemComponent->AddLooseGameplayTag(EquipTag);
+		AbilitySystemComponent->SetTagMapCount(EquipTag, 1);
+		UE_LOG(LogTemp, Log, TEXT("Equipped Item: %s"), *EquipTag.ToString());
 	}
+
+	EEquipmentSlot Slot = Item->GetEquipmentSlot();
+	EquippedItems.Add(Slot, Item);
+
+	Item->DisableCollision();
 }
+
+void ALS_Character::UnequipItem(ALS_BaseItem* Item)
+{
+	if (!Item || !AbilitySystemComponent) return;
+
+	FGameplayTag EquipTag = Item->GetEquipTag();
+	if (EquipTag.IsValid())
+	{
+		AbilitySystemComponent->RemoveLooseGameplayTag(EquipTag);
+		UE_LOG(LogTemp, Log, TEXT("Unequipped Item: %s"), *EquipTag.ToString());
+	}
+
+	EEquipmentSlot Slot = Item->GetEquipmentSlot();
+	if (EquippedItems.Contains(Slot))
+	{
+		EquippedItems.Remove(Slot);
+	}
+
+	Item->EnableCollision();
+}
+
+ALS_BaseItem* ALS_Character::GetEquippedItem(EEquipmentSlot Slot) const
+{
+	if (EquippedItems.Contains(Slot))
+	{
+		return EquippedItems[Slot];
+	}
+	return nullptr;
+}
+
 bool ALS_Character::IsItemEquipped(EEquipmentSlot Slot) const
 {
-	FName Tag = FName(TEXT("State.Equipped.") + EnumToString(Slot));
-	return AbilitySystemComponent->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(Tag));
+	return EquippedItems.Contains(Slot) && EquippedItems[Slot] != nullptr;
 }
 
 void ALS_Character::NotifyControllerChanged()

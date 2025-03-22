@@ -4,6 +4,7 @@
 #include "LS_BaseGun.h"
 #include "LS_BaseBullet.h"
 #include "LS_BaseMag.h"
+#include "LS_Character.h"
 #include "Kismet/GameplayStatics.h"
 
 ALS_BaseGun::ALS_BaseGun()
@@ -42,6 +43,8 @@ void ALS_BaseGun::AddAttachment(ALS_GunAttachment* Attachment)
 	}
 	Attachments.Add(SlotName, Attachment);
 
+	UE_LOG(LogTemp, Log, TEXT("Attachment Added: %s"), *Attachment->GetName());
+
 	Attachment->AttachToActor(this, FAttachmentTransformRules::SnapToTargetIncludingScale);
 }
 
@@ -59,12 +62,14 @@ bool ALS_BaseGun::Fire()
 	ALS_GunAttachment* Attachment = GetAttachment("Mag");
 	if (!Attachment)
 	{
+		UE_LOG(LogTemp, Error, TEXT("Mag Attachment Lost"));
 		return false;
 	}
 
 	ALS_BaseMag* Mag = Cast<ALS_BaseMag>(Attachment);
 	if (!Mag)
 	{
+		UE_LOG(LogTemp, Error, TEXT("Mag Lost"));
 		return false;
 	}
 
@@ -77,6 +82,7 @@ bool ALS_BaseGun::Fire()
 	TSubclassOf<ALS_BaseBullet> BulletClass = Mag->ConsumeBullet();
 	if (!BulletClass)
 	{
+		UE_LOG(LogTemp, Error, TEXT("Mag Empty"));
 		return false;
 	}
 
@@ -87,12 +93,40 @@ bool ALS_BaseGun::Fire()
 	ALS_BaseBullet* Bullet = World->SpawnActor<ALS_BaseBullet>(BulletClass, SpawnLocation, SpawnRotation);
 	if (!Bullet)
 	{
+		UE_LOG(LogTemp, Error, TEXT("Bullet does not spawned"));
 		return false;
 	}
 
 	Bullet->FireInDirection(SpawnRotation.Vector());
 
 	return true;
+}
+
+void ALS_BaseGun::Interact(AActor* Interactor)
+{
+	Super::Interact(Interactor);
+
+	ALS_Character* Character = Cast<ALS_Character>(Interactor);
+	if (!Character)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Not found Character"))
+		return;
+	}
+
+	Character->EquipItem(this);
+
+	FAttachmentTransformRules AttachRules(EAttachmentRule::SnapToTarget, true);
+	AttachToComponent(Character->GetMesh(), AttachRules, "hand_r");
+}
+
+void ALS_BaseGun::ShowInteractionUI()
+{
+	Super::ShowInteractionUI();
+}
+
+void ALS_BaseGun::HideInteractionUI()
+{
+	Super::HideInteractionUI();
 }
 
 ALS_GunAttachment* ALS_BaseGun::GetAttachment(FName AttachmentSlot) const

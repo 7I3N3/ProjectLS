@@ -42,6 +42,7 @@ void ALS_BaseBullet::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPr
 	{
 		UGameplayStatics::ApplyDamage(OtherActor, Damage, GetInstigatorController(), this, UDamageType::StaticClass());
 
+		UE_LOG(LogTemp, Log, TEXT("Bullet Hit"));
 		// 벽 관통 로직 추가할 것
 		Destroy();
 	}
