@@ -18,18 +18,22 @@ public class ProjectLS : ModuleRules
 		});
 		PrivateDependencyModuleNames.AddRange(new string[]
 		{
-
-		});
+			"GameplayAbilities", 
+			"GameplayTags", 
+			"GameplayTasks"
+        });
 
 		PublicIncludePaths.AddRange(new string[]
 		{
 			"ProjectLS/Public",
-            "ProjectLS/Public/Interfaces"
+            "ProjectLS/Public/Interfaces",
+            "ProjectLS/Public/Items"
         });
 		PrivateIncludePaths.AddRange(new string[]
 		{
             "ProjectLS/Private",
-            "ProjectLS/Private/Interfaces"
+            "ProjectLS/Private/Interfaces",
+            "ProjectLS/Private/Items"
         });
     }
 }

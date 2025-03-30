@@ -36,7 +36,8 @@ ALS_Character::ALS_Character()
 
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
-	FollowCamera->bUsePawnControlRotation = true;
+	FollowCamera->bUsePawnControlRotation = false;
+	LookRotator = FRotator::ZeroRotator;
 }
 
 void ALS_Character::NotifyControllerChanged()
@@ -91,5 +92,8 @@ void ALS_Character::Look(const FInputActionValue& Value)
 	{
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
+
+		LookRotator.Pitch = FMath::Clamp(LookRotator.Pitch + (LookAxisVector.Y * 0.4f), -12.0f, 15.0f);
+		LookRotator.Yaw = FMath::Clamp(LookRotator.Yaw + (LookAxisVector.X * 0.25f), -15.0f, 15.0f);
 	}
 }
