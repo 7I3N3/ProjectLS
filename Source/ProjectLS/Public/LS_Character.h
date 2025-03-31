@@ -14,7 +14,7 @@ class UInputComponent;
 struct FInputActionValue;
 
 UCLASS(config=Game)
-class ALS_Character : public ACharacter
+class PROJECTLS_API ALS_Character : public ACharacter
 {
 	GENERATED_BODY()
 

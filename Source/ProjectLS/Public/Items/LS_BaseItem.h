@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "LS_Interactable.h"
 #include "LS_BaseItem.generated.h"
 
 UCLASS(config=Game)
-class ALS_BaseItem : public AActor
+class PROJECTLS_API ALS_BaseItem : public AActor, public ILS_Interactable
 {
 	GENERATED_BODY()
 
@@ -16,7 +17,11 @@ private:
 
 
 protected:
-	
+	TObjectPtr<UShapeComponent> InteractionCollision;
+
+	TMap<FString, TFunction<void()>> InteractionOptions;
+
+
 
 public:
 
@@ -28,10 +33,20 @@ private:
 
 
 protected:
-	
+	virtual void BeginPlay() override;
+
 
 public:
 	ALS_BaseItem();
+
+	virtual UShapeComponent* GetInteractionCollision() const override { return InteractionCollision; };
+
+	virtual TMap<FString, TFunction<void()>> GetInteractionOptions() const override { return InteractionOptions; };
+
+	virtual void ExecuteInteraction(const FText& SelectedOption, APlayerController* PlayerController) override;
+
+	virtual void ShowInteractUI() override;
+	virtual void HideInteractUI() override;
 
 #pragma endregion Functions
 };

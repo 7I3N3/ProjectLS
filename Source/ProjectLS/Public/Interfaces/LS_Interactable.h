@@ -16,18 +16,6 @@ class PROJECTLS_API ILS_Interactable
 {
 	GENERATED_BODY()
 
-#pragma region Parameters
-private:
-
-
-protected:
-
-
-public:
-
-
-#pragma endregion Parameters
-
 #pragma region Functions
 private:
 
@@ -36,7 +24,14 @@ protected:
 
 
 public:
+	virtual UShapeComponent* GetInteractionCollision() const = 0;
 
+	virtual TMap<FString, TFunction<void()>> GetInteractionOptions() const = 0;
+
+	virtual void ExecuteInteraction(const FText& SelectedOption, APlayerController* PlayerController) = 0;
+
+	virtual void ShowInteractUI() = 0;
+	virtual void HideInteractUI() = 0;
 
 #pragma endregion Functions
 };

@@ -16,18 +16,6 @@ class PROJECTLS_API ILS_Equipable
 {
 	GENERATED_BODY()
 
-#pragma region Parameters
-private:
-
-
-protected:
-
-
-public:
-
-
-#pragma endregion Parameters
-
 #pragma region Functions
 private:
 
