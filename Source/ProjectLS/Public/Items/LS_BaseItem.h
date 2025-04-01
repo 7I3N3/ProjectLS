@@ -18,7 +18,10 @@ private:
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UShapeComponent> InteractionCollision;
+	FName ItemID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item", meta = (AllowPrivateAccess = "true"))
+	FName ItemName;
 
 	TMap<FString, TFunction<void()>> InteractionOptions;
 
@@ -34,15 +37,15 @@ private:
 protected:
 	virtual void BeginPlay() override;
 
-
 public:
 	ALS_BaseItem();
-
-	virtual UShapeComponent* GetInteractionCollision() const override { return InteractionCollision; };
 
 	virtual TMap<FString, TFunction<void()>> GetInteractionOptions() const override { return InteractionOptions; };
 
 	virtual void ExecuteInteraction(const FString& SelectedOption, APlayerController* PlayerController) override;
+
+	FORCEINLINE FName GetItemID() const { return ItemID; }
+	FORCEINLINE FName GetItemName() const { return ItemName; }
 
 #pragma endregion Functions
 };

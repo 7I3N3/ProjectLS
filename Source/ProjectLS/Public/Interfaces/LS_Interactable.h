@@ -24,8 +24,6 @@ protected:
 
 
 public:
-	virtual UShapeComponent* GetInteractionCollision() const = 0;
-
 	virtual TMap<FString, TFunction<void()>> GetInteractionOptions() const = 0;
 
 	virtual void ExecuteInteraction(const FString& SelectedOption, APlayerController* PlayerController) = 0;
