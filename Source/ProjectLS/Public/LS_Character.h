@@ -13,6 +13,9 @@ class UInputAction;
 class UInputComponent;
 struct FInputActionValue;
 
+class ILS_Interactable;
+class ULS_InteractionMenuWidget;
+
 UCLASS(config=Game)
 class PROJECTLS_API ALS_Character : public ACharacter
 {
@@ -36,9 +39,22 @@ protected:
 	TObjectPtr<UInputAction> MoveAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInputAction> LookAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> InteractAction;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	FRotator LookRotator;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Widget", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<ULS_InteractionMenuWidget> InteractionMenuClass;
+
+	UPROPERTY()
+	TObjectPtr<ULS_InteractionMenuWidget> InteractionMenu;
+
+	ILS_Interactable* CurrentInteractable;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Interact", meta = (AllowPrivateAccess = "true"))
+	float InteractDistnace = 300.0f;
 
 public:
 
@@ -50,14 +66,19 @@ private:
 
 
 protected:
+	virtual void BeginPlay() override;
+
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
+	void Interact();
 
 	virtual void NotifyControllerChanged() override;
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
 public:
 	ALS_Character();
+
+	virtual void Tick(float DeltaTime) override;
 
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }

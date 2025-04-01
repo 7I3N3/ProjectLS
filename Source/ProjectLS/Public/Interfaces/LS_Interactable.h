@@ -28,10 +28,7 @@ public:
 
 	virtual TMap<FString, TFunction<void()>> GetInteractionOptions() const = 0;
 
-	virtual void ExecuteInteraction(const FText& SelectedOption, APlayerController* PlayerController) = 0;
-
-	virtual void ShowInteractUI() = 0;
-	virtual void HideInteractUI() = 0;
+	virtual void ExecuteInteraction(const FString& SelectedOption, APlayerController* PlayerController) = 0;
 
 #pragma endregion Functions
 };

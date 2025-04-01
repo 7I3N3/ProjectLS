@@ -14,7 +14,8 @@ public class ProjectLS : ModuleRules
 			"CoreUObject",
 			"Engine",
 			"InputCore",
-			"EnhancedInput"
+			"EnhancedInput",
+			"UMG"
 		});
 		PrivateDependencyModuleNames.AddRange(new string[]
 		{
@@ -27,13 +28,15 @@ public class ProjectLS : ModuleRules
 		{
 			"ProjectLS/Public",
             "ProjectLS/Public/Interfaces",
-            "ProjectLS/Public/Items"
+            "ProjectLS/Public/Items",
+            "ProjectLS/Public/Widgets"
         });
 		PrivateIncludePaths.AddRange(new string[]
 		{
             "ProjectLS/Private",
             "ProjectLS/Private/Interfaces",
-            "ProjectLS/Private/Items"
+            "ProjectLS/Private/Items",
+            "ProjectLS/Private/Widgets"
         });
     }
 }

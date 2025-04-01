@@ -12,17 +12,7 @@ void ALS_BaseItem::BeginPlay()
 	Super::BeginPlay();
 }
 
-void ALS_BaseItem::ExecuteInteraction(const FText& SelectedOption, APlayerController* PlayerController)
-{
-
-}
-
-void ALS_BaseItem::ShowInteractUI()
-{
-
-}
-
-void ALS_BaseItem::HideInteractUI()
+void ALS_BaseItem::ExecuteInteraction(const FString& SelectedOption, APlayerController* PlayerController)
 {
 
 }

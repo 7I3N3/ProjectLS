@@ -17,11 +17,10 @@ private:
 
 
 protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UShapeComponent> InteractionCollision;
 
 	TMap<FString, TFunction<void()>> InteractionOptions;
-
-
 
 public:
 
@@ -43,10 +42,7 @@ public:
 
 	virtual TMap<FString, TFunction<void()>> GetInteractionOptions() const override { return InteractionOptions; };
 
-	virtual void ExecuteInteraction(const FText& SelectedOption, APlayerController* PlayerController) override;
-
-	virtual void ShowInteractUI() override;
-	virtual void HideInteractUI() override;
+	virtual void ExecuteInteraction(const FString& SelectedOption, APlayerController* PlayerController) override;
 
 #pragma endregion Functions
 };

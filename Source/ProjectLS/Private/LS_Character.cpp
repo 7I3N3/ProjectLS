@@ -10,6 +10,9 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "LS_Interactable.h"
+#include "LS_InteractionMenuWidget.h"
+#include "Blueprint/UserWidget.h"
 
 ALS_Character::ALS_Character()
 {
@@ -40,6 +43,59 @@ ALS_Character::ALS_Character()
 	LookRotator = FRotator::ZeroRotator;
 }
 
+void ALS_Character::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (InteractionMenuClass)
+	{
+		InteractionMenu = CreateWidget<ULS_InteractionMenuWidget>(GetWorld(), InteractionMenuClass);
+		if (InteractionMenu)
+		{
+			InteractionMenu->AddToViewport();
+			InteractionMenu->SetVisibility(ESlateVisibility::Hidden);
+		}
+	}
+}
+
+void ALS_Character::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	FHitResult Hit;
+	FVector Start = FollowCamera->GetComponentLocation();
+	FVector End = Start + (FollowCamera->GetForwardVector() * 300.0f);
+
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+
+	FHitResult HitResult;
+	if (GetWorld()->LineTraceSingleByChannel(HitResult, FollowCamera->GetComponentLocation(), End, ECC_Visibility))
+	{
+		AActor* HitActor = HitResult.GetActor();
+		if (HitActor && HitActor->Implements<ULS_Interactable>())
+		{
+			ILS_Interactable* Interactable = Cast<ILS_Interactable>(HitActor);
+			if (Interactable)
+			{
+				CurrentInteractable = Interactable;
+
+				TArray<FString> InteractionOptionStrings;
+				CurrentInteractable->GetInteractionOptions().GetKeys(InteractionOptionStrings);
+				InteractionMenu->UpdateMenu(InteractionOptionStrings);
+				InteractionMenu->SetVisibility(ESlateVisibility::Visible);
+				return;
+			}
+		}
+	}
+
+	if (CurrentInteractable)
+	{
+		InteractionMenu->SetVisibility(ESlateVisibility::Hidden);
+		CurrentInteractable = nullptr;
+	}
+}
+
 void ALS_Character::NotifyControllerChanged()
 {
 	Super::NotifyControllerChanged();
@@ -63,6 +119,8 @@ void ALS_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ALS_Character::Move);
 
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ALS_Character::Look);
+
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ALS_Character::Interact);
 	}
 }
 
@@ -95,5 +153,18 @@ void ALS_Character::Look(const FInputActionValue& Value)
 
 		LookRotator.Pitch = FMath::Clamp(LookRotator.Pitch + (LookAxisVector.Y * 0.4f), -12.0f, 15.0f);
 		LookRotator.Yaw = FMath::Clamp(LookRotator.Yaw + (LookAxisVector.X * 0.25f), -15.0f, 15.0f);
+	}
+}
+
+void ALS_Character::Interact()
+{
+	if (Controller && CurrentInteractable && InteractionMenu)
+	{
+		APlayerController* PlayerController = Cast<APlayerController>(Controller);
+
+		if (PlayerController)
+		{
+			CurrentInteractable->ExecuteInteraction(*InteractionMenu->GetSelectedOptionString(), PlayerController);
+		}
 	}
 }
