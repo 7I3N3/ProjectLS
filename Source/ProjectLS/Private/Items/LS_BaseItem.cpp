@@ -15,5 +15,8 @@ void ALS_BaseItem::BeginPlay()
 
 void ALS_BaseItem::ExecuteInteraction(const FString& SelectedOption, APlayerController* PlayerController)
 {
-
+	if (InteractionOptions.Contains(SelectedOption))
+	{
+		InteractionOptions[SelectedOption]();
+	}
 }

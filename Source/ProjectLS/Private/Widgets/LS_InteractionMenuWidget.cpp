@@ -60,30 +60,31 @@ void ULS_InteractionMenuWidget::RefreshUI()
     int32 OptionCount = OptionStrings.Num();
     int32 CurrentWidgetCount = OptionWidgets.Num();
 
-    for (int32 i = 0; i < OptionCount; i++)
+    while (OptionWidgets.Num() < OptionCount)
     {
-        ULS_InteractionOptionWidget* OptionWidget = nullptr;
+        ULS_InteractionOptionWidget* OptionWidget = CreateWidget<ULS_InteractionOptionWidget>(GetOwningPlayer(), OptionWidgetClass);
+        if (!OptionWidget) break;
 
-        if (i < CurrentWidgetCount)
+        OptionWidget->SetVisibility(ESlateVisibility::Collapsed);
+        OptionList->AddChild(OptionWidget);
+        OptionWidgets.Add(OptionWidget);
+    }
+
+    for (int32 i = 0; i < OptionWidgets.Num(); i++)
+    {
+        ULS_InteractionOptionWidget* OptionWidget = OptionWidgets[i];
+
+        if (!OptionWidget) continue;
+
+        if (i < OptionCount)
         {
-            OptionWidget = OptionWidgets[i];
+            OptionWidget->SetupOptionWidget(OptionStrings[i]);
+            OptionWidget->SetHighlight(i == SelectedIndex);
+            OptionWidget->SetVisibility(ESlateVisibility::Visible);
         }
         else
         {
-            OptionWidget = CreateWidget<ULS_InteractionOptionWidget>(GetOwningPlayer(), OptionWidgetClass);
-            if (!OptionWidget) continue;
-
-            OptionList->AddChild(OptionWidget);
-            OptionWidgets.Add(OptionWidget);
+            OptionWidget->SetVisibility(ESlateVisibility::Collapsed);
         }
-
-        OptionWidget->SetupOptionWidget(OptionStrings[i]);
-        OptionWidget->SetHighlight(i == SelectedIndex);
-        OptionWidget->SetVisibility(ESlateVisibility::Visible);
-    }
-
-    for (int32 i = OptionCount; i < CurrentWidgetCount; i++)
-    {
-        OptionWidgets[i]->SetVisibility(ESlateVisibility::Collapsed);
     }
 }

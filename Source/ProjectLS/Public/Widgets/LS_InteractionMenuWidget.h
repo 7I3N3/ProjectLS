@@ -63,8 +63,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void MoveSelection(int32 Direction);
 
-	FORCEINLINE UVerticalBox* GetOptionList() { return OptionList; }
-	FORCEINLINE TArray<ULS_InteractionOptionWidget*> GetOptionTextBlocks() { return OptionWidgets; }
+	FORCEINLINE UVerticalBox* GetOptionList() const { return OptionList; }
+	FORCEINLINE TArray<ULS_InteractionOptionWidget*> GetOptionTextBlocks() const { return OptionWidgets; }
+	FORCEINLINE int32 GetSelectedIndex() const { return SelectedIndex; }
 
 #pragma endregion Functions
 };

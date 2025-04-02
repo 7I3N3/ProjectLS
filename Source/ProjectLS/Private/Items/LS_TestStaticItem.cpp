@@ -5,14 +5,16 @@
 
 ALS_TestStaticItem::ALS_TestStaticItem()
 {
-	InteractionOptions.Add(TEXT("Test1"), [this]() { ALS_TestStaticItem::TestInteractionOptionFunction1(); });
-	InteractionOptions.Add(TEXT("Test2"), [this]() { ALS_TestStaticItem::TestInteractionOptionFunction2(); });
-	InteractionOptions.Add(TEXT("Test3"), [this]() { ALS_TestStaticItem::TestInteractionOptionFunction3(); });
+	
 }
 
 void ALS_TestStaticItem::BeginPlay()
 {
 	Super::BeginPlay();
+
+	InteractionOptions.Add(TEXT("Test1"), [this]() { ALS_TestStaticItem::TestInteractionOptionFunction1(); });
+	InteractionOptions.Add(TEXT("Test2"), [this]() { ALS_TestStaticItem::TestInteractionOptionFunction2(); });
+	InteractionOptions.Add(TEXT("Test3"), [this]() { ALS_TestStaticItem::TestInteractionOptionFunction3(); });
 }
 
 void ALS_TestStaticItem::ExecuteInteraction(const FString& SelectedOption, APlayerController* PlayerController)

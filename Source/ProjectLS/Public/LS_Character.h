@@ -41,6 +41,8 @@ protected:
 	TObjectPtr<UInputAction> LookAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInputAction> InteractAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> SelectInteractionOptionAction;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	FRotator LookRotator;
@@ -71,6 +73,7 @@ protected:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void Interact();
+	void SelectInteractionOption(const FInputActionValue& Value);
 
 	virtual void NotifyControllerChanged() override;
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;

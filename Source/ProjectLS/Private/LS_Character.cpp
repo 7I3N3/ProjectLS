@@ -78,6 +78,8 @@ void ALS_Character::Tick(float DeltaTime)
 			ILS_Interactable* Interactable = Cast<ILS_Interactable>(HitActor);
 			if (Interactable)
 			{
+				if (Interactable == CurrentInteractable) return;
+
 				CurrentInteractable = Interactable;
 
 				TArray<FString> InteractionOptionStrings;
@@ -121,6 +123,8 @@ void ALS_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ALS_Character::Look);
 
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ALS_Character::Interact);
+
+		EnhancedInputComponent->BindAction(SelectInteractionOptionAction, ETriggerEvent::Triggered, this, &ALS_Character::SelectInteractionOption);
 	}
 }
 
@@ -167,4 +171,14 @@ void ALS_Character::Interact()
 			CurrentInteractable->ExecuteInteraction(*InteractionMenu->GetSelectedOptionString(), PlayerController);
 		}
 	}
+}
+
+void ALS_Character::SelectInteractionOption(const FInputActionValue& Value)
+{
+	if (!CurrentInteractable) return;
+
+	float Scroll = Value.Get<float>();
+	if (Scroll == 0) return;
+
+	InteractionMenu->MoveSelection((int32)Scroll);
 }
