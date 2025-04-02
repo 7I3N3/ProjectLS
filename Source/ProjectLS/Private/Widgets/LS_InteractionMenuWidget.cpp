@@ -1,6 +1,36 @@
 #include "LS_InteractionMenuWidget.h"
+#include "LS_InteractionOptionWidget.h"
 #include "Components/VerticalBox.h"
 #include "Components/TextBlock.h"
+
+void ULS_InteractionMenuWidget::NativeOnInitialized()
+{
+    Super::NativeOnInitialized();
+
+    OptionWidgets.Reserve(MaxOptionCount);
+
+    for (int32 i = 0; i < MaxOptionCount; i++)
+    {
+        ULS_InteractionOptionWidget* OptionWidget = CreateWidget<ULS_InteractionOptionWidget>(GetOwningPlayer(), OptionWidgetClass);
+        if (!OptionWidget) continue;
+
+        OptionWidget->SetVisibility(ESlateVisibility::Collapsed);
+        OptionWidgets.Add(OptionWidget);
+    }
+}
+
+void ULS_InteractionMenuWidget::NativeConstruct()
+{
+    Super::NativeConstruct();
+
+    if (OptionList)
+    {
+        for (ULS_InteractionOptionWidget* OptionWidget : OptionWidgets)
+        {
+            OptionList->AddChild(OptionWidget);
+        }
+    }
+}
 
 void ULS_InteractionMenuWidget::UpdateMenu(const TArray<FString>& Options)
 {
@@ -27,24 +57,33 @@ void ULS_InteractionMenuWidget::RefreshUI()
 {
     if (!OptionList) return;
 
-    OptionList->ClearChildren();
-    OptionTextBlocks.Empty();
+    int32 OptionCount = OptionStrings.Num();
+    int32 CurrentWidgetCount = OptionWidgets.Num();
 
-    for (int32 i = 0; i < OptionStrings.Num(); i++)
+    for (int32 i = 0; i < OptionCount; i++)
     {
-        UTextBlock* OptionText = NewObject<UTextBlock>(this);
-        OptionText->SetText(FText::FromString(OptionStrings[i]));
+        ULS_InteractionOptionWidget* OptionWidget = nullptr;
 
-        if (i == SelectedIndex)
+        if (i < CurrentWidgetCount)
         {
-            OptionText->SetColorAndOpacity(FSlateColor(FLinearColor::Yellow));
+            OptionWidget = OptionWidgets[i];
         }
         else
         {
-            OptionText->SetColorAndOpacity(FSlateColor(FLinearColor::White));
+            OptionWidget = CreateWidget<ULS_InteractionOptionWidget>(GetOwningPlayer(), OptionWidgetClass);
+            if (!OptionWidget) continue;
+
+            OptionList->AddChild(OptionWidget);
+            OptionWidgets.Add(OptionWidget);
         }
 
-        OptionList->AddChild(OptionText);
-        OptionTextBlocks.Add(OptionText);
+        OptionWidget->SetupOptionWidget(OptionStrings[i]);
+        OptionWidget->SetHighlight(i == SelectedIndex);
+        OptionWidget->SetVisibility(ESlateVisibility::Visible);
+    }
+
+    for (int32 i = OptionCount; i < CurrentWidgetCount; i++)
+    {
+        OptionWidgets[i]->SetVisibility(ESlateVisibility::Collapsed);
     }
 }

@@ -4,8 +4,10 @@
 #include "Blueprint/UserWidget.h"
 #include "LS_InteractionMenuWidget.generated.h"
 
+class UImage;
 class UVerticalBox;
 class UTextBlock;
+class ULS_InteractionOptionWidget;
 
 UCLASS()
 class PROJECTLS_API ULS_InteractionMenuWidget : public UUserWidget
@@ -18,10 +20,19 @@ private:
 
 protected:
 	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UImage> BackgroundImage;
+
+	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UVerticalBox> OptionList;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<ULS_InteractionOptionWidget> OptionWidgetClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	int32 MaxOptionCount = 5;
+
 	UPROPERTY()
-	TArray<TObjectPtr<UTextBlock>> OptionTextBlocks;
+	TArray<TObjectPtr<ULS_InteractionOptionWidget>> OptionWidgets;
 
 	TArray<FString> OptionStrings;
 
@@ -40,6 +51,9 @@ protected:
 	void RefreshUI();
 
 public:
+	virtual void NativeOnInitialized() override;
+	virtual void NativeConstruct() override;
+
 	UFUNCTION(BlueprintCallable)
 	void UpdateMenu(const TArray<FString>& Options);
 
@@ -50,7 +64,7 @@ public:
 	void MoveSelection(int32 Direction);
 
 	FORCEINLINE UVerticalBox* GetOptionList() { return OptionList; }
-	FORCEINLINE TArray<UTextBlock*> GetOptionTextBlocks() { return OptionTextBlocks; }
+	FORCEINLINE TArray<ULS_InteractionOptionWidget*> GetOptionTextBlocks() { return OptionWidgets; }
 
 #pragma endregion Functions
 };
