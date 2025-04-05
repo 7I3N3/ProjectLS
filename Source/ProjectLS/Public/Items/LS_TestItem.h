@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Items/LS_StaticMeshItem.h"
-#include "LS_TestStaticItem.generated.h"
+#include "LS_BaseItem.h"
+#include "LS_TestItem.generated.h"
 
 UCLASS()
-class PROJECTLS_API ALS_TestStaticItem : public ALS_StaticMeshItem
+class PROJECTLS_API ALS_TestItem : public ALS_BaseItem
 {
 	GENERATED_BODY()
 
@@ -34,7 +34,7 @@ protected:
 	virtual void TestInteractionOptionFunction3();
 
 public:
-	ALS_TestStaticItem();
+	ALS_TestItem();
 
 	virtual void ExecuteInteraction(const FString& SelectedOption, APlayerController* PlayerController) override;
 

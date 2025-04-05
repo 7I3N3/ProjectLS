@@ -6,6 +6,16 @@
 #include "UObject/Interface.h"
 #include "LS_Attachable.generated.h"
 
+UENUM(BlueprintType)
+enum class EAttachmentSlotType : uint8
+{
+	AS_Muzzle UMETA(DisplayName = "Muzzle"),
+	AS_Foregrip UMETA(DisplayName = "Foregrip"),
+	AS_Scope UMETA(DisplayName = "Scope"),
+	AS_Tactical UMETA(DisplayName = "Tactical"),
+	AS_Mag UMETA(DisplayName = "Mag")
+};
+
 UINTERFACE(MinimalAPI)
 class ULS_Attachable : public UInterface
 {
@@ -24,7 +34,11 @@ protected:
 
 
 public:
+	virtual EAttachmentSlotType GetAttachmentSlotType() const = 0;
 
+	virtual void OnAttached(AActor* Parent, FName SocketName) = 0;
+
+	virtual void OnDetached() = 0;
 
 #pragma endregion Functions
 };

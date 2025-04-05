@@ -6,9 +6,17 @@
 
 ALS_SkeletalMeshItem::ALS_SkeletalMeshItem()
 {
-	ItemMesh = CreateDefaultSubobject <USkeletalMeshComponent>(TEXT("ItemMesh"));
+	SkeletalMesh = CreateDefaultSubobject <USkeletalMeshComponent>(TEXT("SkeletalMesh"));
 
-	ItemMesh->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	if (ItemMesh)
+	{
+		SkeletalMesh->AttachToComponent(ItemMesh, FAttachmentTransformRules::KeepRelativeTransform);
+
+		ItemMesh->SetVisibility(false);
+	}
+
+	SkeletalMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	SkeletalMesh->SetSimulatePhysics(false); 
 }
 
 void ALS_SkeletalMeshItem::BeginPlay()

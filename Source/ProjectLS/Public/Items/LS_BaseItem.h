@@ -25,6 +25,9 @@ protected:
 
 	TMap<FString, TFunction<void()>> InteractionOptions;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UStaticMeshComponent> ItemMesh;
+
 public:
 
 
@@ -46,6 +49,8 @@ public:
 
 	FORCEINLINE FName GetItemID() const { return ItemID; }
 	FORCEINLINE FName GetItemName() const { return ItemName; }
+
+	FORCEINLINE UStaticMeshComponent* GetItemMesh() const { return ItemMesh; }
 
 #pragma endregion Functions
 };

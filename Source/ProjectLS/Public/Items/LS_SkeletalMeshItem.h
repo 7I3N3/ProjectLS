@@ -19,7 +19,7 @@ private:
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<USkeletalMeshComponent> ItemMesh;
+	TObjectPtr<USkeletalMeshComponent> SkeletalMesh;
 
 public:
 
@@ -38,7 +38,7 @@ public:
 
 	virtual void ExecuteInteraction(const FString& SelectedOption, APlayerController* PlayerController) override;
 
-	FORCEINLINE USkeletalMeshComponent* GetItemMesh() const { return ItemMesh; }
+	FORCEINLINE USkeletalMeshComponent* GetSkeletalMesh() const { return SkeletalMesh; }
 
 #pragma endregion Functions
 };
