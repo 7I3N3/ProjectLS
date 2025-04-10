@@ -41,6 +41,8 @@ void ALS_BaseMag::OnAttached(AActor* Parent, FName SocketName)
 		AttachToActor(Parent, FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
 	}
 
+	bIsAttached = true;
+
 	SetActorEnableCollision(true);
 	SetActorHiddenInGame(false);
 }
@@ -48,6 +50,8 @@ void ALS_BaseMag::OnAttached(AActor* Parent, FName SocketName)
 void ALS_BaseMag::OnDetached()
 {
 	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+
+	bIsAttached = false;
 
 	SetActorEnableCollision(false);
 	SetActorHiddenInGame(true);

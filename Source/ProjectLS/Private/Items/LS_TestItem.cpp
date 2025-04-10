@@ -12,9 +12,9 @@ void ALS_TestItem::BeginPlay()
 {
 	Super::BeginPlay();
 
-	InteractionOptions.Add(TEXT("Test1"), [this]() { ALS_TestItem::TestInteractionOptionFunction1(); });
-	InteractionOptions.Add(TEXT("Test2"), [this]() { ALS_TestItem::TestInteractionOptionFunction2(); });
-	InteractionOptions.Add(TEXT("Test3"), [this]() { ALS_TestItem::TestInteractionOptionFunction3(); });
+	InteractionOptions.Add(TEXT("Test1"), [this](ALS_Character* Interactor) { ALS_TestItem::TestInteractionOptionFunction1(); });
+	InteractionOptions.Add(TEXT("Test2"), [this](ALS_Character* Interactor) { ALS_TestItem::TestInteractionOptionFunction2(); });
+	InteractionOptions.Add(TEXT("Test3"), [this](ALS_Character* Interactor) { ALS_TestItem::TestInteractionOptionFunction3(); });
 }
 
 void ALS_TestItem::ExecuteInteraction(const FString& SelectedOption, APlayerController* PlayerController)

@@ -40,5 +40,25 @@ public:
 
 	virtual void OnDetached() = 0;
 
+	virtual bool IsAttached() const = 0;
+
 #pragma endregion Functions
+};
+
+USTRUCT(Atomic, BlueprintType)
+struct FAttachmentSlot
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attachment")
+	EAttachmentSlotType SlotType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attachment")
+	FName SlotName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attachment")
+	TScriptInterface<ILS_Attachable> Attachment;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attachment", meta = (MakeEditWidget))
+	FTransform SlotTransform;
 };

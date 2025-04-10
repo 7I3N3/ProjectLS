@@ -23,7 +23,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item", meta = (AllowPrivateAccess = "true"))
 	FName ItemName;
 
-	TMap<FString, TFunction<void()>> InteractionOptions;
+	TMap<FString, TFunction<void(ALS_Character* Interactor)>> InteractionOptions;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UStaticMeshComponent> ItemMesh;
@@ -43,7 +43,7 @@ protected:
 public:
 	ALS_BaseItem();
 
-	virtual TMap<FString, TFunction<void()>> GetInteractionOptions() const override { return InteractionOptions; };
+	virtual TMap<FString, TFunction<void(ALS_Character* Interactor)>> GetInteractionOptions() const override { return InteractionOptions; };
 
 	virtual void ExecuteInteraction(const FString& SelectedOption, APlayerController* PlayerController) override;
 

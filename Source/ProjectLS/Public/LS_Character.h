@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "LS_Equipable.h"
 #include "LS_Character.generated.h"
 
 class USpringArmComponent;
@@ -15,6 +16,8 @@ struct FInputActionValue;
 
 class ILS_Interactable;
 class ULS_InteractionMenuWidget;
+
+class ALS_BaseGun;
 
 UCLASS(config=Game)
 class PROJECTLS_API ALS_Character : public ACharacter
@@ -43,6 +46,12 @@ protected:
 	TObjectPtr<UInputAction> InteractAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInputAction> SelectInteractionOptionAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> ShootAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> SelectMainWeaponAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> SelectSubWeaponAction;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	FRotator LookRotator;
@@ -57,6 +66,11 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Interact", meta = (AllowPrivateAccess = "true"))
 	float InteractDistnace = 300.0f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category = "Equipment")
+	TMap<EEquipmentSlotType, TScriptInterface<ILS_Equipable>> EquippedItems;
+
+	TScriptInterface<ILS_Equipable> CurrentWeapon;
 
 public:
 
@@ -74,6 +88,13 @@ protected:
 	void Look(const FInputActionValue& Value);
 	void Interact();
 	void SelectInteractionOption(const FInputActionValue& Value);
+	void Shoot();
+	void StopShoot();
+	void SelectMainWeapon();
+	void SelectSubWeapon();
+
+	void SwitchWeapon(EEquipmentSlotType TargetSlot);
+
 
 	virtual void NotifyControllerChanged() override;
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
@@ -82,6 +103,9 @@ public:
 	ALS_Character();
 
 	virtual void Tick(float DeltaTime) override;
+
+	bool EquipItem(const TScriptInterface<ILS_Equipable>& Item);
+	bool UnequipItem(EEquipmentSlotType SlotType);
 
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }

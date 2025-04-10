@@ -11,6 +11,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "LS_Interactable.h"
+#include "LS_BaseGun.h"
 #include "LS_InteractionMenuWidget.h"
 #include "Blueprint/UserWidget.h"
 
@@ -125,6 +126,13 @@ void ALS_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ALS_Character::Interact);
 
 		EnhancedInputComponent->BindAction(SelectInteractionOptionAction, ETriggerEvent::Triggered, this, &ALS_Character::SelectInteractionOption);
+
+		EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Started, this, &ALS_Character::Shoot);
+		EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Completed, this, &ALS_Character::StopShoot);
+
+		EnhancedInputComponent->BindAction(SelectMainWeaponAction, ETriggerEvent::Started, this, &ALS_Character::SelectMainWeapon);
+
+		EnhancedInputComponent->BindAction(SelectSubWeaponAction, ETriggerEvent::Started, this, &ALS_Character::SelectSubWeapon);
 	}
 }
 
@@ -181,4 +189,100 @@ void ALS_Character::SelectInteractionOption(const FInputActionValue& Value)
 	if (Scroll == 0) return;
 
 	InteractionMenu->MoveSelection((int32)Scroll);
+}
+
+void ALS_Character::Shoot()
+{
+	if (CurrentWeapon)
+	{
+		ALS_BaseGun* Gun = Cast<ALS_BaseGun>(CurrentWeapon.GetObject());
+
+		if (Gun)
+		{
+			Gun->StartFiring();
+		}
+	}
+}
+
+void ALS_Character::StopShoot()
+{
+	if (CurrentWeapon)
+	{
+		ALS_BaseGun* Gun = Cast<ALS_BaseGun>(CurrentWeapon.GetObject());
+
+		if (Gun)
+		{
+			Gun->StopFiring();
+		}
+	}
+}
+
+bool ALS_Character::EquipItem(const TScriptInterface<ILS_Equipable>& Item)
+{
+	if (!Item) return false;
+
+	EEquipmentSlotType SlotType = Item->GetSlotType();
+
+	if (EquippedItems.Contains(SlotType))
+	{
+		TScriptInterface<ILS_Equipable> ExistingItem = EquippedItems[SlotType];
+		if (ExistingItem)
+		{
+			ExistingItem->Unequip(this);
+		}
+	}
+
+	Item->Equip(this);
+	EquippedItems.Add(SlotType, Item);
+
+	if (SlotType == EEquipmentSlotType::ES_MainWeapon || SlotType == EEquipmentSlotType::ES_SubWeapon)
+	{
+
+		CurrentWeapon = Item;
+	}
+
+	return true;
+}
+
+bool ALS_Character::UnequipItem(EEquipmentSlotType SlotType)
+{
+	if (!EquippedItems.Contains(SlotType)) return false;
+
+	TScriptInterface<ILS_Equipable> Item = EquippedItems[SlotType];
+	if (Item)
+	{
+		Item->Unequip(this);
+	}
+
+	EquippedItems.Remove(SlotType);
+
+	return true;
+}
+
+void ALS_Character::SelectMainWeapon()
+{
+	SwitchWeapon(EEquipmentSlotType::ES_MainWeapon);
+}
+void ALS_Character::SelectSubWeapon()
+{
+	SwitchWeapon(EEquipmentSlotType::ES_SubWeapon);
+}
+
+void ALS_Character::SwitchWeapon(EEquipmentSlotType TargetSlot)
+{
+	TScriptInterface<ILS_Equipable> TargetWeapon = EquippedItems.FindRef(TargetSlot);
+
+	if (!TargetWeapon)
+		return;
+
+	if (CurrentWeapon == TargetWeapon)
+		return;
+
+	if (CurrentWeapon)
+	{
+		CurrentWeapon->Unequip(this);
+	}
+
+	TargetWeapon->Equip(this);
+	CurrentWeapon = TargetWeapon;
 }

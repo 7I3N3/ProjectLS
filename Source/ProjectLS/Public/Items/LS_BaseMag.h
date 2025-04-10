@@ -29,6 +29,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mag", meta = (AllowPrivateAccess = "true"))
 	int32 MaxAmmoCount = 30;
 
+	bool bIsAttached = false;
+
 public:
 
 
@@ -51,6 +53,8 @@ public:
 
 	virtual void OnAttached(AActor* Parent, FName SocketName) override;
 	virtual void OnDetached() override;
+
+	virtual bool IsAttached() const override { return bIsAttached; }
 
 	FORCEINLINE virtual bool IsEmpty() const { return AmmoStack.IsEmpty(); }
 	FORCEINLINE virtual bool IsFull() const { return AmmoStack.Num() == MaxAmmoCount; }

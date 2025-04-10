@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
+#include "LS_Character.h"
 #include "LS_Interactable.generated.h"
 
 UINTERFACE(MinimalAPI)
@@ -24,7 +25,7 @@ protected:
 
 
 public:
-	virtual TMap<FString, TFunction<void()>> GetInteractionOptions() const = 0;
+	virtual TMap<FString, TFunction<void(ALS_Character* Interactor)>> GetInteractionOptions() const = 0;
 
 	virtual void ExecuteInteraction(const FString& SelectedOption, APlayerController* PlayerController) = 0;
 

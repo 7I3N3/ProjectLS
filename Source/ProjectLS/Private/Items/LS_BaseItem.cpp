@@ -23,6 +23,11 @@ void ALS_BaseItem::ExecuteInteraction(const FString& SelectedOption, APlayerCont
 {
 	if (InteractionOptions.Contains(SelectedOption))
 	{
-		InteractionOptions[SelectedOption]();
+		ALS_Character* Interactor = Cast<ALS_Character>(PlayerController->GetPawn());
+
+		if (Interactor)
+		{
+			InteractionOptions[SelectedOption](Interactor);
+		}
 	}
 }
