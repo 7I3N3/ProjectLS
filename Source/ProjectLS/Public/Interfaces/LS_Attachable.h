@@ -58,7 +58,4 @@ struct FAttachmentSlot
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attachment")
 	TScriptInterface<ILS_Attachable> Attachment;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attachment", meta = (MakeEditWidget))
-	FTransform SlotTransform;
 };

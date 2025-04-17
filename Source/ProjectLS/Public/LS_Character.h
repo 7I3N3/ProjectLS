@@ -13,6 +13,7 @@ class UInputMappingContext;
 class UInputAction;
 class UInputComponent;
 struct FInputActionValue;
+struct FInputActionInstance;
 
 class ILS_Interactable;
 class ULS_InteractionMenuWidget;
@@ -49,9 +50,25 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInputAction> ShootAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UInputAction> SelectMainWeaponAction;
+	TObjectPtr<UInputAction> Quickslot1Action;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UInputAction> SelectSubWeaponAction;
+	TObjectPtr<UInputAction> Quickslot2Action;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> Quickslot3Action;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> Quickslot4Action;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> Quickslot5Action;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> Quickslot6Action;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> Quickslot7Action;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> Quickslot8Action;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> Quickslot9Action;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> Quickslot0Action;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	FRotator LookRotator;
@@ -90,11 +107,21 @@ protected:
 	void SelectInteractionOption(const FInputActionValue& Value);
 	void Shoot();
 	void StopShoot();
-	void SelectMainWeapon();
-	void SelectSubWeapon();
+
+	void SelectQuickslot1();
+	void SelectQuickslot2();
+	void SelectQuickslot3();
+	void SelectQuickslot4();
+	void SelectQuickslot5();
+	void SelectQuickslot6();
+	void SelectQuickslot7();
+	void SelectQuickslot8();
+	void SelectQuickslot9();
+	void SelectQuickslot0();
+
+	void SelectQuickslot(int32 SlotIndex);
 
 	void SwitchWeapon(EEquipmentSlotType TargetSlot);
-
 
 	virtual void NotifyControllerChanged() override;
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;

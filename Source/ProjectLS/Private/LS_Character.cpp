@@ -130,9 +130,16 @@ void ALS_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Started, this, &ALS_Character::Shoot);
 		EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Completed, this, &ALS_Character::StopShoot);
 
-		EnhancedInputComponent->BindAction(SelectMainWeaponAction, ETriggerEvent::Started, this, &ALS_Character::SelectMainWeapon);
-
-		EnhancedInputComponent->BindAction(SelectSubWeaponAction, ETriggerEvent::Started, this, &ALS_Character::SelectSubWeapon);
+		EnhancedInputComponent->BindAction(Quickslot1Action, ETriggerEvent::Triggered, this, &ALS_Character::SelectQuickslot1);
+		EnhancedInputComponent->BindAction(Quickslot2Action, ETriggerEvent::Triggered, this, &ALS_Character::SelectQuickslot2);
+		EnhancedInputComponent->BindAction(Quickslot3Action, ETriggerEvent::Triggered, this, &ALS_Character::SelectQuickslot3);
+		EnhancedInputComponent->BindAction(Quickslot4Action, ETriggerEvent::Triggered, this, &ALS_Character::SelectQuickslot4);
+		EnhancedInputComponent->BindAction(Quickslot5Action, ETriggerEvent::Triggered, this, &ALS_Character::SelectQuickslot5);
+		EnhancedInputComponent->BindAction(Quickslot6Action, ETriggerEvent::Triggered, this, &ALS_Character::SelectQuickslot6);
+		EnhancedInputComponent->BindAction(Quickslot7Action, ETriggerEvent::Triggered, this, &ALS_Character::SelectQuickslot7);
+		EnhancedInputComponent->BindAction(Quickslot8Action, ETriggerEvent::Triggered, this, &ALS_Character::SelectQuickslot8);
+		EnhancedInputComponent->BindAction(Quickslot9Action, ETriggerEvent::Triggered, this, &ALS_Character::SelectQuickslot9);
+		EnhancedInputComponent->BindAction(Quickslot0Action, ETriggerEvent::Triggered, this, &ALS_Character::SelectQuickslot0);
 	}
 }
 
@@ -259,13 +266,63 @@ bool ALS_Character::UnequipItem(EEquipmentSlotType SlotType)
 	return true;
 }
 
-void ALS_Character::SelectMainWeapon()
+void ALS_Character::SelectQuickslot(int32 SlotIndex)
 {
-	SwitchWeapon(EEquipmentSlotType::ES_MainWeapon);
+	switch (SlotIndex)
+	{
+	case 1:
+		SwitchWeapon(EEquipmentSlotType::ES_MainWeapon);
+		break;
+
+	case 2:
+		SwitchWeapon(EEquipmentSlotType::ES_SubWeapon);
+		break;
+
+	default:
+		UE_LOG(LogTemp, Log, TEXT("QuickSlot %d Selected"), SlotIndex);
+		break;
+	}
 }
-void ALS_Character::SelectSubWeapon()
+
+void ALS_Character::SelectQuickslot1()
 {
-	SwitchWeapon(EEquipmentSlotType::ES_SubWeapon);
+	SelectQuickslot(1);
+}
+void ALS_Character::SelectQuickslot2()
+{
+	SelectQuickslot(2);
+}
+void ALS_Character::SelectQuickslot3()
+{
+	SelectQuickslot(3);
+}
+void ALS_Character::SelectQuickslot4()
+{
+	SelectQuickslot(4);
+}
+void ALS_Character::SelectQuickslot5()
+{
+	SelectQuickslot(5);
+}
+void ALS_Character::SelectQuickslot6()
+{
+	SelectQuickslot(6);
+}
+void ALS_Character::SelectQuickslot7()
+{
+	SelectQuickslot(7);
+}
+void ALS_Character::SelectQuickslot8()
+{
+	SelectQuickslot(8);
+}
+void ALS_Character::SelectQuickslot9()
+{
+	SelectQuickslot(9);
+}
+void ALS_Character::SelectQuickslot0()
+{
+	SelectQuickslot(0);
 }
 
 void ALS_Character::SwitchWeapon(EEquipmentSlotType TargetSlot)

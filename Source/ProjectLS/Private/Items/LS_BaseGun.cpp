@@ -14,6 +14,12 @@ void ALS_BaseGun::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if (ItemMesh)
+	{
+		ItemMesh->SetSimulatePhysics(true);
+		ItemMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	}
+
 	InteractionOptions.Add(TEXT("Take"), [this](ALS_Character* Interactor) { ALS_BaseGun::Take(Interactor); });
 	InteractionOptions.Add(TEXT("Equip"), [this](ALS_Character* Interactor) { ALS_BaseGun::Equip(Interactor); });
 	InteractionOptions.Add(TEXT("Examine"), [this](ALS_Character* Interactor) { ALS_BaseGun::Examine(Interactor); });
@@ -94,8 +100,14 @@ void ALS_BaseGun::Equip(ALS_Character* Wearer)
 {
 	if (!Wearer) return;
 
+	if (ItemMesh)
+	{
+		ItemMesh->SetSimulatePhysics(false);
+		ItemMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+
 	FAttachmentTransformRules Rules(EAttachmentRule::SnapToTarget, true);
-	this->AttachToComponent(Wearer->GetMesh(), Rules, TEXT("WeaponSocket"));
+	this->AttachToComponent(Wearer->GetMesh(), Rules, TEXT("hand_r_ik"));
 
 	bIsEquipped = true;
 	EquippedCharacter = Wearer;
@@ -105,6 +117,12 @@ void ALS_BaseGun::Unequip(ALS_Character* Wearer)
 	if (!bIsEquipped || !Wearer) return;
 
 	this->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+
+	if (ItemMesh)
+	{
+		ItemMesh->SetSimulatePhysics(true);
+		ItemMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	}
 
 	bIsEquipped = false;
 	EquippedCharacter = nullptr;
