@@ -28,6 +28,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UStaticMeshComponent> ItemMesh;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item", meta = (AllowPrivateAccess = "true"))
+	FIntPoint ItemSize;
+
 public:
 
 
@@ -51,6 +54,8 @@ public:
 	FORCEINLINE FName GetItemName() const { return ItemName; }
 
 	FORCEINLINE UStaticMeshComponent* GetItemMesh() const { return ItemMesh; }
+
+	FORCEINLINE FIntPoint GetItemSize() const { return ItemSize; }
 
 #pragma endregion Functions
 };
