@@ -7,6 +7,8 @@
 #include "LS_Interactable.h"
 #include "LS_BaseItem.generated.h"
 
+class UTexture2D;
+
 UCLASS(config=Game)
 class PROJECTLS_API ALS_BaseItem : public AActor, public ILS_Interactable
 {
@@ -30,6 +32,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item", meta = (AllowPrivateAccess = "true"))
 	FIntPoint ItemSize;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UTexture2D> ItemIcon;
 
 public:
 
@@ -56,6 +61,8 @@ public:
 	FORCEINLINE UStaticMeshComponent* GetItemMesh() const { return ItemMesh; }
 
 	FORCEINLINE FIntPoint GetItemSize() const { return ItemSize; }
+
+	FORCEINLINE UTexture2D* GetIcon() const { return ItemIcon; }
 
 #pragma endregion Functions
 };

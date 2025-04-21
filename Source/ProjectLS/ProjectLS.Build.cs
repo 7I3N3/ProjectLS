@@ -19,7 +19,9 @@ public class ProjectLS : ModuleRules
 		});
 		PrivateDependencyModuleNames.AddRange(new string[]
 		{
-			"GameplayAbilities", 
+			"Slate",
+			"SlateCore",
+            "GameplayAbilities", 
 			"GameplayTags", 
 			"GameplayTasks"
         });

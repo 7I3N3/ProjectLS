@@ -2,13 +2,15 @@
 
 #include "CoreMinimal.h"
 #include "LS_BaseItem.h"
+#include "LS_Equipable.h"
+#include "LS_InventoryOwner.h"
 #include "LS_BaseBagpack.generated.h"
 
 class ULS_InventoryComponent;
 class ULS_InventoryWidget;
 
 UCLASS()
-class PROJECTLS_API ALS_BaseBagpack : public ALS_BaseItem, public ILS_Equipable
+class PROJECTLS_API ALS_BaseBagpack : public ALS_BaseItem, public ILS_Equipable, public ILS_InventoryOwner
 {
 	GENERATED_BODY()
 
@@ -22,9 +24,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<ULS_InventoryWidget> InventoryWidgetClass;
-
-	UPROPERTY()
-	TObjectPtr<ULS_InventoryWidget> InventoryWidget;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Equipment", meta = (AllowPrivateAccess = "true"))
 	EEquipmentSlotType SlotType;
@@ -54,10 +53,8 @@ public:
 	virtual EEquipmentSlotType GetSlotType() const override { return SlotType; }
 	virtual bool IsEquipped() const override { return bIsEquipped; }
 
-	void ShowInventoryUI(APlayerController* PC);
-	void HideInventoryUI(APlayerController* PC);
-
-	ULS_InventoryWidget* GetInventoryWidget() const { return InventoryWidget; }
+	virtual ULS_InventoryComponent* GetInventoryComponent() const override { return InventoryComponent; }
+	virtual TSubclassOf<ULS_InventoryWidget> GetInventoryWidgetClass() const override { return InventoryWidgetClass; }
 
 #pragma endregion Functions
 };
