@@ -6,6 +6,7 @@
 
 class UVerticalBox;
 class ULS_PlayerEquipmentWidget;
+class ULS_InventoryWidget;
 
 UCLASS()
 class PROJECTLS_API ULS_PlayerStatusWidget : public UUserWidget
@@ -25,6 +26,9 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	ULS_PlayerEquipmentWidget* EquipmentWidget;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<ULS_InventoryWidget> InventoryWidgetClass;
+
 public:
 
 
@@ -40,6 +44,8 @@ protected:
 public:
 	UFUNCTION(BlueprintCallable)
 	void SetupEquipmentAndInventories(const TMap<EEquipmentSlotType, TScriptInterface<ILS_Equipable>>& EquippedItems);
+
+	ULS_PlayerEquipmentWidget* GetEquipmentWidget() const { return EquipmentWidget; }
 
 #pragma endregion Functions
 };

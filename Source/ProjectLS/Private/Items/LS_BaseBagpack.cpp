@@ -7,14 +7,16 @@
 
 ALS_BaseBagpack::ALS_BaseBagpack()
 {
-	InventoryComponent = CreateDefaultSubobject<ULS_InventoryComponent>(TEXT("InventoryComponent"));
+
 }
 
 void ALS_BaseBagpack::BeginPlay()
 {
 	Super::BeginPlay();
 
-	InventoryComponent->InitializeGrid();
+	GetComponents<ULS_InventoryComponent>(InventoryComponents);
+
+	InteractionOptions.Add(TEXT("Equip"), [this](ALS_Character* Interactor) { ALS_BaseBagpack::Equip(Interactor); });
 }
 
 void ALS_BaseBagpack::ExecuteInteraction(const FString& SelectedOption, APlayerController* PlayerController)
@@ -24,10 +26,26 @@ void ALS_BaseBagpack::ExecuteInteraction(const FString& SelectedOption, APlayerC
 
 void ALS_BaseBagpack::Equip(ALS_Character* Wearer)
 {
-	
+	if (!Wearer) return;
+
+	Wearer->EquipItem(this);
+
+	EquippedCharacter = Wearer;
+
+	if (ItemMesh)
+	{
+		ItemMesh->SetSimulatePhysics(false);
+		ItemMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
 }
 
 void ALS_BaseBagpack::Unequip(ALS_Character* Wearer)
 {
-	
+	EquippedCharacter = nullptr;
+
+	if (ItemMesh)
+	{
+		ItemMesh->SetSimulatePhysics(true);
+		ItemMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	}
 }

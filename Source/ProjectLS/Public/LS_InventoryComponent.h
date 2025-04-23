@@ -19,7 +19,7 @@ struct FItemSlotData
 	FIntPoint SlotPos;
 };
 
-UCLASS(config=Game)
+UCLASS(config=Game, meta = (BlueprintSpawnableComponent))
 class PROJECTLS_API ULS_InventoryComponent : public UActorComponent
 {
 	GENERATED_BODY()

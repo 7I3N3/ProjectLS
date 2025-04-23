@@ -8,30 +8,31 @@
 void ULS_PlayerStatusWidget::SetupEquipmentAndInventories(const TMap<EEquipmentSlotType, TScriptInterface<ILS_Equipable>>& EquippedItems)
 {
 	if (!InventoryContainer) return;
+	if (!EquipmentWidget) return;
+
 	InventoryContainer->ClearChildren();
 
 	for (const auto& Pair : EquippedItems)
 	{
 		UObject* ItemObject = Pair.Value.GetObject();
+		EquipmentWidget->UpdateEquipmentSlot(Pair.Key, ItemObject);
+
 		if (!ItemObject || !ItemObject->Implements<ULS_InventoryOwner>()) continue;
 
 		ILS_InventoryOwner* InventoryOwner = Cast<ILS_InventoryOwner>(ItemObject);
-		ULS_InventoryComponent* InvComp = InventoryOwner->GetInventoryComponent();
-		TSubclassOf<ULS_InventoryWidget> WidgetClass = InventoryOwner->GetInventoryWidgetClass();
+		TArray<ULS_InventoryComponent*> InventoryComponents = InventoryOwner->GetInventoryComponents();
 
-		if (InvComp && WidgetClass)
+		if (InventoryComponents.Num() > 0 && InventoryWidgetClass)
 		{
-			ULS_InventoryWidget* InventoryWidget = CreateWidget<ULS_InventoryWidget>(this, WidgetClass);
-			if (InventoryWidget)
+			for (auto InventoryComponent : InventoryComponents)
 			{
-				InventoryWidget->SetInventoryComponent(InvComp);
-				InventoryContainer->AddChildToVerticalBox(InventoryWidget);
+				ULS_InventoryWidget* InventoryWidget = CreateWidget<ULS_InventoryWidget>(this, InventoryWidgetClass);
+				if (InventoryWidget)
+				{
+					InventoryWidget->SetInventoryComponent(InventoryComponent);
+					InventoryContainer->AddChildToVerticalBox(InventoryWidget);
+				}
 			}
-		}
-
-		if (EquipmentWidget)
-		{
-			EquipmentWidget->UpdateEquipmentSlot(Pair.Key, ItemObject);
 		}
 	}
 }

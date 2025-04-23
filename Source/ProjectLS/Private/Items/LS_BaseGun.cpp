@@ -4,6 +4,7 @@
 #include "LS_BaseGun.h"
 #include "LS_BaseMag.h"
 #include "LS_Character.h"
+#include "LS_PlayerStatusWidget.h"
 
 ALS_BaseGun::ALS_BaseGun()
 {
@@ -99,6 +100,8 @@ bool ALS_BaseGun::DetachAttachment(EAttachmentSlotType SlotType, FName SlotName)
 void ALS_BaseGun::Equip(ALS_Character* Wearer)
 {
 	if (!Wearer) return;
+	
+	Wearer->EquipItem(this);
 
 	if (ItemMesh)
 	{

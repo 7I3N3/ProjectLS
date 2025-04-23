@@ -18,6 +18,8 @@ struct FInputActionInstance;
 class ILS_Interactable;
 class ULS_InteractionMenuWidget;
 
+class ULS_PlayerStatusWidget;
+
 class ALS_BaseGun;
 
 UCLASS(config=Game)
@@ -69,15 +71,23 @@ protected:
 	TObjectPtr<UInputAction> Quickslot9Action;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInputAction> Quickslot0Action;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> PlayerStatusToggleAction;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	FRotator LookRotator;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Widget", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<ULS_InteractionMenuWidget> InteractionMenuClass;
-
 	UPROPERTY()
 	TObjectPtr<ULS_InteractionMenuWidget> InteractionMenu;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Widget", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<ULS_PlayerStatusWidget> PlayerStatusClass;
+	UPROPERTY()
+	TObjectPtr<ULS_PlayerStatusWidget> PlayerStatus;
+
+	bool bIsPlayerStatusOpen = false;
 
 	ILS_Interactable* CurrentInteractable;
 
@@ -123,6 +133,8 @@ protected:
 
 	void SwitchWeapon(EEquipmentSlotType TargetSlot);
 
+	void PlayerStatusToggle();
+
 	virtual void NotifyControllerChanged() override;
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
@@ -138,6 +150,8 @@ public:
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
 	FORCEINLINE FRotator GetLookRotator() const { return LookRotator; }
+
+	FORCEINLINE ULS_PlayerStatusWidget* GetPlayerStatus() const { return PlayerStatus; }
 
 #pragma endregion Functions
 };

@@ -13,6 +13,7 @@
 #include "LS_Interactable.h"
 #include "LS_BaseGun.h"
 #include "LS_InteractionMenuWidget.h"
+#include "LS_PlayerStatusWidget.h"
 #include "Blueprint/UserWidget.h"
 
 ALS_Character::ALS_Character()
@@ -48,13 +49,28 @@ void ALS_Character::BeginPlay()
 {
 	Super::BeginPlay();
 
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	if (!PC) return;
+
 	if (InteractionMenuClass)
 	{
-		InteractionMenu = CreateWidget<ULS_InteractionMenuWidget>(GetWorld(), InteractionMenuClass);
+		InteractionMenu = CreateWidget<ULS_InteractionMenuWidget>(PC, InteractionMenuClass);
 		if (InteractionMenu)
 		{
 			InteractionMenu->AddToViewport();
 			InteractionMenu->SetVisibility(ESlateVisibility::Hidden);
+		}
+	}
+
+	if (PlayerStatusClass)
+	{
+		PlayerStatus = CreateWidget<ULS_PlayerStatusWidget>(PC, PlayerStatusClass);
+		if (PlayerStatus)
+		{
+			PlayerStatus->AddToViewport();
+			PlayerStatus->SetVisibility(ESlateVisibility::Hidden);
+
+			PlayerStatus->SetupEquipmentAndInventories(EquippedItems);
 		}
 	}
 }
@@ -140,6 +156,8 @@ void ALS_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		EnhancedInputComponent->BindAction(Quickslot8Action, ETriggerEvent::Triggered, this, &ALS_Character::SelectQuickslot8);
 		EnhancedInputComponent->BindAction(Quickslot9Action, ETriggerEvent::Triggered, this, &ALS_Character::SelectQuickslot9);
 		EnhancedInputComponent->BindAction(Quickslot0Action, ETriggerEvent::Triggered, this, &ALS_Character::SelectQuickslot0);
+
+		EnhancedInputComponent->BindAction(PlayerStatusToggleAction, ETriggerEvent::Started, this, &ALS_Character::PlayerStatusToggle);
 	}
 }
 
@@ -239,8 +257,9 @@ bool ALS_Character::EquipItem(const TScriptInterface<ILS_Equipable>& Item)
 		}
 	}
 
-	Item->Equip(this);
 	EquippedItems.Add(SlotType, Item);
+
+	PlayerStatus->SetupEquipmentAndInventories(EquippedItems);
 
 	if (SlotType == EEquipmentSlotType::ES_MainWeapon || SlotType == EEquipmentSlotType::ES_SubWeapon)
 	{
@@ -342,4 +361,33 @@ void ALS_Character::SwitchWeapon(EEquipmentSlotType TargetSlot)
 
 	TargetWeapon->Equip(this);
 	CurrentWeapon = TargetWeapon;
+}
+
+void ALS_Character::PlayerStatusToggle()
+{
+	if (!PlayerStatus) return;
+
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	if (!PC) return;
+
+	if (bIsPlayerStatusOpen)
+	{
+		bIsPlayerStatusOpen = false;
+		PlayerStatus->SetVisibility(ESlateVisibility::Hidden);
+
+		FInputModeGameOnly InputMode;
+		PC->SetInputMode(InputMode);
+		PC->bShowMouseCursor = false;
+	}
+	else
+	{
+		bIsPlayerStatusOpen = true;
+		PlayerStatus->SetVisibility(ESlateVisibility::Visible);
+
+		FInputModeGameAndUI InputMode;
+		InputMode.SetWidgetToFocus(PlayerStatus->TakeWidget());
+		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+		PC->SetInputMode(InputMode);
+		PC->bShowMouseCursor = true;
+	}
 }
