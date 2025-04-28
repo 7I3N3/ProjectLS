@@ -27,7 +27,7 @@ protected:
 
 
 public:
-    virtual TArray<ULS_InventoryComponent*> GetInventoryComponents() const = 0;
+    virtual ULS_InventoryComponent* GetInventoryComponent() const = 0;
 
 #pragma endregion Functions
 };

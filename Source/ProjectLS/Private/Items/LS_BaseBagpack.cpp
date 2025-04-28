@@ -7,15 +7,14 @@
 
 ALS_BaseBagpack::ALS_BaseBagpack()
 {
-
+	InventoryComponent = CreateDefaultSubobject<ULS_InventoryComponent>(TEXT("InventoryComponent"));
 }
 
 void ALS_BaseBagpack::BeginPlay()
 {
 	Super::BeginPlay();
 
-	GetComponents<ULS_InventoryComponent>(InventoryComponents);
-
+	InventoryComponent->InitializeInventory();
 	InteractionOptions.Add(TEXT("Equip"), [this](ALS_Character* Interactor) { ALS_BaseBagpack::Equip(Interactor); });
 }
 

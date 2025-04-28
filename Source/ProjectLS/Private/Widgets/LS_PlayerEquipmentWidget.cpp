@@ -21,13 +21,13 @@ void ULS_PlayerEquipmentWidget::NativeConstruct()
 	}
 }
 
-void ULS_PlayerEquipmentWidget::UpdateEquipmentSlot(EEquipmentSlotType SlotType, UObject* Item)
+void ULS_PlayerEquipmentWidget::UpdateEquipmentSlot(EEquipmentSlotType SlotType, ALS_BaseItem* Item)
 {
 	if (ULS_EquipmentSlotWidget** FoundWidget = SlotMap.Find(SlotType))
 	{
 		if (*FoundWidget)
 		{
-			(*FoundWidget)->SetItem(Item);
+			(*FoundWidget)->UpdateSlot(Item);
 		}
 	}
 }

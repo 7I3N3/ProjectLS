@@ -7,111 +7,49 @@ ULS_InventoryComponent::ULS_InventoryComponent()
 
 }
 
-void ULS_InventoryComponent::InitializeGrid()
+void ULS_InventoryComponent::InitializeInventory()
 {
-	ItemGrid.SetNum(GridSize.X);
-	for (int32 X = 0; X < GridSize.X; ++X)
+	if (GridSizes.Num() != GridOffsets.Num())
 	{
-		ItemGrid[X].SetNum(GridSize.Y);
-		for (int32 Y = 0; Y < GridSize.Y; ++Y)
-		{
-			ItemGrid[X][Y] = FItemSlotData{ nullptr, FIntPoint(X, Y) };
-		}
-	}
-}
-
-bool ULS_InventoryComponent::CanPlaceItemAt(ALS_BaseItem* Item, FIntPoint StartPos) const
-{
-	if (!Item) return false;
-
-	FIntPoint ItemSize = Item->GetItemSize();
-
-	// 범위 초과 체크
-	if (StartPos.X + ItemSize.X > GridSize.X || StartPos.Y + ItemSize.Y > GridSize.Y)
-		return false;
-
-	for (int32 X = 0; X < ItemSize.X; ++X)
-	{
-		for (int32 Y = 0; Y < ItemSize.Y; ++Y)
-		{
-			int32 GridX = StartPos.X + X;
-			int32 GridY = StartPos.Y + Y;
-
-			if (!ItemGrid.IsValidIndex(GridX) || !ItemGrid[GridX].IsValidIndex(GridY))
-				return false;
-
-			if (ItemGrid[GridX][GridY].Item != nullptr)
-				return false;
-		}
-	}
-
-	return true;
-}
-
-bool ULS_InventoryComponent::PlaceItem(ALS_BaseItem* Item, FIntPoint StartPos)
-{
-	if (!CanPlaceItemAt(Item, StartPos))
-		return false;
-
-	FIntPoint ItemSize = Item->GetItemSize();
-
-	for (int32 X = 0; X < ItemSize.X; ++X)
-	{
-		for (int32 Y = 0; Y < ItemSize.Y; ++Y)
-		{
-			int32 GridX = StartPos.X + X;
-			int32 GridY = StartPos.Y + Y;
-
-			ItemGrid[GridX][GridY].Item = Item;
-			ItemGrid[GridX][GridY].SlotPos = StartPos;
-		}
-	}
-
-	return true;
-}
-
-void ULS_InventoryComponent::RemoveItemAt(FIntPoint StartPos)
-{
-	if (!ItemGrid.IsValidIndex(StartPos.X) || !ItemGrid[StartPos.X].IsValidIndex(StartPos.Y))
+		UE_LOG(LogTemp, Warning, TEXT("Dosent match GridSizes.Num(), GridOffsets.Num()"));
 		return;
+	}
+	Containers.Empty();
 
-	ALS_BaseItem* TargetItem = ItemGrid[StartPos.X][StartPos.Y].Item;
-	if (!TargetItem) return;
-
-	FIntPoint ItemSize = TargetItem->GetItemSize();
-
-	for (int32 X = 0; X < ItemSize.X; ++X)
+	for (int32 Index = 0; Index < GridSizes.Num(); Index++)
 	{
-		for (int32 Y = 0; Y < ItemSize.Y; ++Y)
-		{
-			int32 GridX = StartPos.X + X;
-			int32 GridY = StartPos.Y + Y;
+		const FIntPoint GridSize = GridSizes[Index];
+		const FIntPoint GridOffset = GridOffsets[Index];
 
-			if (ItemGrid[GridX][GridY].Item == TargetItem)
-			{
-				ItemGrid[GridX][GridY].Item = nullptr;
-			}
-		}
+		FLS_InventoryContainer Container;
+		Container.Initialize(GridSize, GridOffset);
+		Containers.Add(Container);
 	}
 }
 
-TArray<FItemSlotData> ULS_InventoryComponent::GetAllItems() const
+bool ULS_InventoryComponent::TryAddItem(ALS_BaseItem* Item)
 {
-	TSet<ALS_BaseItem*> SeenItems;
-	TArray<FItemSlotData> UniqueItems;
-
-	for (int32 X = 0; X < GridSize.X; ++X)
+	for (FLS_InventoryContainer& Container : Containers)
 	{
-		for (int32 Y = 0; Y < GridSize.Y; ++Y)
+		for (int32 y = 0; y < Container.GridSize.Y; ++y)
 		{
-			const FItemSlotData& Slot = ItemGrid[X][Y];
-			if (Slot.Item && !SeenItems.Contains(Slot.Item))
+			for (int32 x = 0; x < Container.GridSize.X; ++x)
 			{
-				SeenItems.Add(Slot.Item);
-				UniqueItems.Add(Slot);
+				if (Container.CanPlaceItem({x, y}, Item))
+				{
+					Container.PlaceItem({ x, y }, Item);
+					return true;
+				}
 			}
 		}
 	}
+	return false;
+}
 
-	return UniqueItems;
+void ULS_InventoryComponent::RemoveItem(ALS_BaseItem* Item)
+{
+	for (FLS_InventoryContainer& Container : Containers)
+	{
+		Container.RemoveItem(Item);
+	}
 }

@@ -37,7 +37,7 @@ protected:
 
 public:
 	UFUNCTION()
-	void UpdateEquipmentSlot(EEquipmentSlotType SlotType, UObject* Item);
+	void UpdateEquipmentSlot(EEquipmentSlotType SlotType, ALS_BaseItem* Item);
 
 #pragma endregion Functions
 };

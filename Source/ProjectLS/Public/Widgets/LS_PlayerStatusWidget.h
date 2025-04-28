@@ -4,7 +4,7 @@
 #include "Blueprint/UserWidget.h"
 #include "LS_PlayerStatusWidget.generated.h"
 
-class UVerticalBox;
+class UScrollBox;
 class ULS_PlayerEquipmentWidget;
 class ULS_InventoryWidget;
 
@@ -21,7 +21,7 @@ protected:
 	//플레이어 스탯 hp, 배고픔, 수분, 등
 
 	UPROPERTY(meta = (BindWidget))
-	UVerticalBox* InventoryContainer;
+	UScrollBox* InventoryScrollBox;
 
 	UPROPERTY(meta = (BindWidget))
 	ULS_PlayerEquipmentWidget* EquipmentWidget;

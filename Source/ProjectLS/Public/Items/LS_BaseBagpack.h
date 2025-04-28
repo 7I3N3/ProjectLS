@@ -19,7 +19,8 @@ private:
 
 
 protected:
-	TArray<ULS_InventoryComponent*> InventoryComponents;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<ULS_InventoryComponent> InventoryComponent;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Equipment", meta = (AllowPrivateAccess = "true"))
 	EEquipmentSlotType SlotType;
@@ -51,7 +52,7 @@ public:
 	virtual EEquipmentSlotType GetSlotType() const override { return SlotType; }
 	virtual bool IsEquipped() const override { return bIsEquipped; }
 
-	virtual TArray<ULS_InventoryComponent*> GetInventoryComponents() const override { return InventoryComponents; }
+	virtual ULS_InventoryComponent* GetInventoryComponent() const override { return InventoryComponent; }
 
 #pragma endregion Functions
 };

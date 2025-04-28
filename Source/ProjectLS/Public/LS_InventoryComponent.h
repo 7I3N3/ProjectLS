@@ -5,18 +5,86 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "LS_Equipable.h"
+#include "LS_BaseItem.h"
 #include "LS_InventoryComponent.generated.h"
 
 USTRUCT(BlueprintType)
-struct FItemSlotData
+struct FLS_InventorySlot
+{
+	GENERATED_BODY()
+
+	bool bIsOccupied = false;
+
+	TObjectPtr<ALS_BaseItem> OccupyingItem;
+};
+
+USTRUCT(BlueprintType)
+struct FLS_InventoryContainer
 {
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<ALS_BaseItem> Item;
+	FIntPoint GridSize;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item", meta = (AllowPrivateAccess = "true"))
-	FIntPoint SlotPos;
+	FIntPoint GridOffset;
+
+	TArray<FLS_InventorySlot> InventorySlots;
+
+	void Initialize(FIntPoint NewGridSize, FIntPoint NewGridOffset)
+	{
+		GridSize = NewGridSize;
+		GridOffset = NewGridOffset;
+		InventorySlots.SetNum(GridSize.X * GridSize.Y);
+	}
+
+	int32 GetIndex(FIntPoint Grid) const { return Grid.Y * GridSize.X + Grid.X; }
+
+	bool CanPlaceItem(FIntPoint StartPos, ALS_BaseItem* Item) const
+	{
+		if (StartPos.X + Item->GetItemSize().X > GridSize.X || StartPos.Y + Item->GetItemSize().Y > GridSize.Y)
+			return false;
+
+		for (int32 y = 0; y < Item->GetItemSize().Y; ++y)
+		{
+			for (int32 x = 0; x < Item->GetItemSize().X; ++x)
+			{
+				int32 Index = GetIndex({ StartPos.X + x, StartPos.Y + y });
+				if (InventorySlots.IsValidIndex(Index) && InventorySlots[Index].bIsOccupied)
+					return false;
+			}
+		}
+		return true;
+	}
+
+	void PlaceItem(FIntPoint StartPos, ALS_BaseItem* Item)
+	{
+		for (int32 y = 0; y < Item->GetItemSize().Y; ++y)
+		{
+			for (int32 x = 0; x < Item->GetItemSize().X; ++x)
+			{
+				int32 Index = GetIndex({StartPos.X + x, StartPos.Y + y});
+				if (InventorySlots.IsValidIndex(Index))
+				{
+					InventorySlots[Index].bIsOccupied = true;
+					InventorySlots[Index].OccupyingItem = Item;
+				}
+			}
+		}
+	}
+
+	void RemoveItem(ALS_BaseItem* Item)
+	{
+		for (auto& Slot : InventorySlots)
+		{
+			if (Slot.OccupyingItem == Item)
+			{
+				Slot.bIsOccupied = false;
+				Slot.OccupyingItem = nullptr;
+			}
+		}
+	}
+
 };
 
 UCLASS(config=Game, meta = (BlueprintSpawnableComponent))
@@ -30,10 +98,12 @@ private:
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
-	FIntPoint GridSize;
+	TArray<FIntPoint> GridSizes;
 
-	TArray<TArray<FItemSlotData>> ItemGrid;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
+	TArray<FIntPoint> GridOffsets;
 
+	TArray<FLS_InventoryContainer> Containers;
 
 public:
 
@@ -50,21 +120,18 @@ protected:
 public:
 	ULS_InventoryComponent();
 
-	void InitializeGrid();
+	UFUNCTION(BlueprintCallable)
+	void InitializeInventory();
 
 	UFUNCTION(BlueprintCallable)
-	bool CanPlaceItemAt(ALS_BaseItem* Item, FIntPoint StartPos) const;
+	bool TryAddItem(ALS_BaseItem* Item);
 
 	UFUNCTION(BlueprintCallable)
-	bool PlaceItem(ALS_BaseItem* Item, FIntPoint StartPos);
+	void RemoveItem(ALS_BaseItem* Item);
 
-	UFUNCTION(BlueprintCallable)
-	void RemoveItemAt(FIntPoint StartPos);
+	TArray<FLS_InventoryContainer> GetInventoryContainers() const { return Containers; }
 
-	UFUNCTION(BlueprintCallable)
-	TArray<FItemSlotData> GetAllItems() const;
-
-	FIntPoint GetGridSize() const { return GridSize; }
+	TArray<FIntPoint> GetGridSizes() const { return GridSizes; }
 
 #pragma endregion Functions
 };
