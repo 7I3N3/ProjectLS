@@ -20,6 +20,7 @@ class ULS_InteractionMenuWidget;
 
 class ULS_PlayerStatusWidget;
 
+class ALS_BaseItem;
 class ALS_BaseGun;
 
 UCLASS(config=Game)
@@ -89,7 +90,7 @@ protected:
 
 	bool bIsPlayerStatusOpen = false;
 
-	ILS_Interactable* CurrentInteractable;
+	ILS_Interactable* CurrentInteractable = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Interact", meta = (AllowPrivateAccess = "true"))
 	float InteractDistnace = 300.0f;
@@ -145,6 +146,11 @@ public:
 
 	bool EquipItem(const TScriptInterface<ILS_Equipable>& Item);
 	bool UnequipItem(EEquipmentSlotType SlotType);
+
+	bool TakeItem(ALS_BaseItem* Item);
+	bool DumpItem(ALS_BaseItem* Item);
+
+	void UpdateStatus();
 
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }

@@ -6,24 +6,24 @@
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "Components/Border.h"
+#include "Components/CanvasPanelSlot.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
 
-void ULS_ItemWidget::UpdateSlot(ALS_BaseItem* NewItem)
+void ULS_ItemWidget::SetItem(ALS_BaseItem* NewItem)
 {
 	ItemRef = NewItem;
 
 	if (ItemRef)
 	{
-		ItemIcon->SetVisibility(ESlateVisibility::Visible);
-	}
-	else
-	{
-		ItemIcon->SetVisibility(ESlateVisibility::Hidden);
-	}
-}
+		ItemIcon->SetBrushFromTexture(ItemRef->GetIcon());
 
-void ULS_ItemWidget::ClearSlot()
-{
-	UpdateSlot(nullptr);
+		FVector2D Size = FVector2D(
+			ItemRef->GetItemSize().X * SlotSize,
+			ItemRef->GetItemSize().Y * SlotSize
+		);
+		SetDesiredSizeInViewport(Size);
+		SetRenderTransformPivot(FVector2D(0.f, 0.f));
+	}
 }
 
 void ULS_ItemWidget::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
@@ -46,43 +46,33 @@ void ULS_ItemWidget::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
 	}
 }
 
+FReply ULS_ItemWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	if (InMouseEvent.IsMouseButtonDown(EKeys::LeftMouseButton))
+	{
+		return UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, EKeys::LeftMouseButton).NativeReply;
+	}
+	else if (InMouseEvent.IsMouseButtonDown(EKeys::RightMouseButton))
+	{
+		// 메뉴창 띄우기
+
+		return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
+	}
+	return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
+}
+
 void ULS_ItemWidget::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
 {
-	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
+	ULS_ItemDragDropOperation* DragOp = NewObject<ULS_ItemDragDropOperation>(this);
+	DragOp->Payload = this;
+	DragOp->DefaultDragVisual = this;
+	DragOp->DraggedItem = ItemRef;
 
-	if (ItemRef)
-	{
-		auto DragOp = NewObject<ULS_ItemDragDropOperation>();
-		DragOp->DraggedItem = ItemRef;
-		DragOp->SourceWidget = this;
-		DragOp->DefaultDragVisual = this; // 아이콘 위젯 등으로 대체 가능
-		OutOperation = DragOp;
-	}
+	OutOperation = DragOp;
 }
 
 bool ULS_ItemWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
-	auto DragOp = Cast<ULS_ItemDragDropOperation>(InOperation);
-	if (DragOp && DragOp->DraggedItem)
-	{
-		if (ItemRef == nullptr)
-		{
-			// 빈 슬롯에 받기
-			ItemRef = DragOp->DraggedItem;
 
-			// 원래 슬롯 비우기
-			if (auto SourceSlot = Cast<ULS_ItemWidget>(DragOp->SourceWidget))
-			{
-				SourceSlot->ClearSlot();
-			}
-			else if (auto EquipSlot = Cast<ULS_EquipmentSlotWidget>(DragOp->SourceWidget))
-			{
-				EquipSlot->ClearSlot();
-			}
-
-			UpdateSlot(ItemRef);
-			return true;
-		}
-	}
-	return false;
+	return Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
 }

@@ -11,6 +11,7 @@ void ULS_PlayerStatusWidget::SetupEquipmentAndInventories(const TMap<EEquipmentS
 	if (!EquipmentWidget) return;
 
 	InventoryScrollBox->ClearChildren();
+	Inventories.Empty();
 
 	for (const auto& Pair : EquippedItems)
 	{
@@ -25,7 +26,8 @@ void ULS_PlayerStatusWidget::SetupEquipmentAndInventories(const TMap<EEquipmentS
 		ULS_InventoryWidget* InventoryWidget = CreateWidget<ULS_InventoryWidget>(this, InventoryWidgetClass);
 		if (InventoryWidget)
 		{
-			InventoryWidget->SetInventoryComponent(InventoryComponent);
+			Inventories.Add(InventoryWidget);
+			InventoryWidget->InitializeInventory(InventoryComponent);
 			InventoryScrollBox->AddChild(InventoryWidget);
 		}
 	}

@@ -13,9 +13,10 @@ struct FLS_InventorySlot
 {
 	GENERATED_BODY()
 
-	bool bIsOccupied = false;
+	TObjectPtr<ALS_BaseItem> OccupyingItem = nullptr;
+	bool bIsRoot = false;
 
-	TObjectPtr<ALS_BaseItem> OccupyingItem;
+	bool CanStack(ALS_BaseItem* NewItem) const { return OccupyingItem && OccupyingItem->CanStackWith(NewItem) && !OccupyingItem->IsFullStack(); }
 };
 
 USTRUCT(BlueprintType)
@@ -23,68 +24,156 @@ struct FLS_InventoryContainer
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item", meta = (AllowPrivateAccess = "true"))
-	FIntPoint GridSize;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "InventoryContainer", meta = (AllowPrivateAccess = "true"))
+	FIntPoint GridSize = { 1, 1 };
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "InventoryContainer", meta = (AllowPrivateAccess = "true"))
+	FIntPoint GridOffset = { 0, 0 };
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item", meta = (AllowPrivateAccess = "true"))
-	FIntPoint GridOffset;
+	FVector2D ScreenPosition;
 
 	TArray<FLS_InventorySlot> InventorySlots;
 
-	void Initialize(FIntPoint NewGridSize, FIntPoint NewGridOffset)
+	void InitializeContainer()
 	{
-		GridSize = NewGridSize;
-		GridOffset = NewGridOffset;
 		InventorySlots.SetNum(GridSize.X * GridSize.Y);
 	}
 
-	int32 GetIndex(FIntPoint Grid) const { return Grid.Y * GridSize.X + Grid.X; }
+	int32 GetIndex(FIntPoint GridPos) const { return GridPos.Y * GridSize.X + GridPos.X; }
+	int32 GetIndex(int32 GridPosX, int32 GridPosY) const { return GridPosY * GridSize.X + GridPosX; }
 
-	bool CanPlaceItem(FIntPoint StartPos, ALS_BaseItem* Item) const
+	bool CanPlaceItem(ALS_BaseItem* Item, int32 StartPosX, int32 StartPosY) const
 	{
-		if (StartPos.X + Item->GetItemSize().X > GridSize.X || StartPos.Y + Item->GetItemSize().Y > GridSize.Y)
+		if (StartPosX + Item->GetItemSize().X > GridSize.X || StartPosY + Item->GetItemSize().Y > GridSize.Y)
 			return false;
 
 		for (int32 y = 0; y < Item->GetItemSize().Y; ++y)
 		{
 			for (int32 x = 0; x < Item->GetItemSize().X; ++x)
 			{
-				int32 Index = GetIndex({ StartPos.X + x, StartPos.Y + y });
-				if (InventorySlots.IsValidIndex(Index) && InventorySlots[Index].bIsOccupied)
+				int32 Index = GetIndex({ StartPosX + x, StartPosY + y });
+				if (!InventorySlots.IsValidIndex(Index) || InventorySlots[Index].OccupyingItem)
 					return false;
 			}
 		}
 		return true;
 	}
-
-	void PlaceItem(FIntPoint StartPos, ALS_BaseItem* Item)
+	bool CanPlaceItem(ALS_BaseItem* Item, FIntPoint StartPos) const
 	{
-		for (int32 y = 0; y < Item->GetItemSize().Y; ++y)
+		return CanPlaceItem(Item, StartPos.X, StartPos.Y);
+	}
+
+	bool TryAddItem(ALS_BaseItem* NewItem)
+	{
+		if (NewItem->IsStackable())
 		{
-			for (int32 x = 0; x < Item->GetItemSize().X; ++x)
+			for (auto& Slot : InventorySlots)
 			{
-				int32 Index = GetIndex({StartPos.X + x, StartPos.Y + y});
+				if (Slot.CanStack(NewItem))
+				{
+					int32 AddAmount = FMath::Min(NewItem->GetCurrentStackCount(), Slot.OccupyingItem->GetMaxStackCount() - Slot.OccupyingItem->GetCurrentStackCount());
+					Slot.OccupyingItem->AddStack(AddAmount);
+					NewItem->AddStack(-AddAmount);
+
+					if (NewItem->GetCurrentStackCount() <= 0)
+						return true;
+				}
+			}
+		}
+
+		for (int32 y = 0; y <= GridSize.Y - NewItem->GetItemSize().Y; ++y)
+		{
+			for (int32 x = 0; x <= GridSize.X - NewItem->GetItemSize().X; ++x)
+			{
+				if (CanPlaceItem(NewItem, x, y))
+				{
+					PlaceItem(NewItem, x, y);
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	bool TryPlaceItemAt(ALS_BaseItem* Item, int32 StartGridX, int32 StartGridY)
+	{
+		if (CanPlaceItem(Item, StartGridX, StartGridY))
+		{
+			PlaceItem(Item, StartGridX, StartGridY);
+			return true;
+		}
+		return false;
+	}
+	bool TryPlaceItemAt(ALS_BaseItem* Item, FIntPoint StartGrid)
+	{
+		return TryPlaceItemAt(Item, StartGrid.X, StartGrid.Y);
+	}
+
+	void PlaceItem(ALS_BaseItem* Item, int32 StartGridX, int32 StartGridY)
+	{
+		for (int32 GridY = 0; GridY < Item->GetItemSize().Y; GridY++)
+		{
+			for (int32 GridX = 0; GridX < Item->GetItemSize().X; GridX++)
+			{
+				int32 Index = GetIndex(StartGridX + GridX, StartGridY + GridY);
+
 				if (InventorySlots.IsValidIndex(Index))
 				{
-					InventorySlots[Index].bIsOccupied = true;
-					InventorySlots[Index].OccupyingItem = Item;
+					FLS_InventorySlot& Slot = InventorySlots[Index];
+					Slot.OccupyingItem = Item;
+					Slot.bIsRoot = (GridX == 0 && GridY == 0);
 				}
 			}
 		}
 	}
+	void PlaceItem(ALS_BaseItem* Item, FIntPoint StartGrid)
+	{
+		PlaceItem(Item, StartGrid.X, StartGrid.Y);
+	}
 
 	void RemoveItem(ALS_BaseItem* Item)
 	{
-		for (auto& Slot : InventorySlots)
+		for (FLS_InventorySlot& Slot : InventorySlots)
 		{
 			if (Slot.OccupyingItem == Item)
 			{
-				Slot.bIsOccupied = false;
 				Slot.OccupyingItem = nullptr;
+				Slot.bIsRoot = false;
 			}
 		}
 	}
 
+	bool IsRootSlot(int32 Index) const { return InventorySlots.IsValidIndex(Index) && InventorySlots[Index].bIsRoot; }
+
+	FIntPoint GetSlotLocalPosition(int Index) const
+	{
+		if (!InventorySlots.IsValidIndex(Index))
+			return FIntPoint::ZeroValue;
+
+		int32 LocalX = Index % GridSize.X;
+		int32 LocalY = Index / GridSize.X;
+
+		return FIntPoint(LocalX, LocalY);
+	}
+	FIntPoint GetSlotWorldPosition(int Index) const
+	{
+		if (!InventorySlots.IsValidIndex(Index))
+			return FIntPoint::ZeroValue;
+
+		return GridOffset + GetSlotLocalPosition(Index);
+	}
+};
+
+USTRUCT(Atomic)
+struct FLS_ItemPlacementInfo
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	int32 ContainerIndex;
+
+	UPROPERTY()
+	FIntPoint StartPos;
 };
 
 UCLASS(config=Game, meta = (BlueprintSpawnableComponent))
@@ -98,12 +187,9 @@ private:
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
-	TArray<FIntPoint> GridSizes;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
-	TArray<FIntPoint> GridOffsets;
-
 	TArray<FLS_InventoryContainer> Containers;
+
+	TMap<ALS_BaseItem*, FLS_ItemPlacementInfo> ItemMap;
 
 public:
 
@@ -120,19 +206,31 @@ protected:
 public:
 	ULS_InventoryComponent();
 
-	UFUNCTION(BlueprintCallable)
 	void InitializeInventory();
 
-	UFUNCTION(BlueprintCallable)
 	bool TryAddItem(ALS_BaseItem* Item);
 
-	UFUNCTION(BlueprintCallable)
+	bool TryPlaceItemAt(ALS_BaseItem* Item, int32 ContainerIndex, int32 StartPosX, int32 StartPosY);
+	bool TryPlaceItemAt(ALS_BaseItem* Item, int32 ContainerIndex, FIntPoint StartPos)
+	{
+		return TryPlaceItemAt(Item, ContainerIndex, StartPos.X, StartPos.Y);
+	}
+
 	void RemoveItem(ALS_BaseItem* Item);
 
-	TArray<FLS_InventoryContainer> GetInventoryContainers() const { return Containers; }
+	bool CanPlaceItem(ALS_BaseItem* Item, int32 ContainerIndex, FIntPoint StartPos) const
+	{
+		return CanPlaceItem(Item, ContainerIndex, StartPos.X, StartPos.Y);
+	}
+	bool CanPlaceItem(ALS_BaseItem* Item, int32 ContainerIndex, int32 StartPosX, int32 StartPosY) const;
+	
 
-	TArray<FIntPoint> GetGridSizes() const { return GridSizes; }
+	bool FindPlacement(ALS_BaseItem* Item, int32& OutContainerIndex, FIntPoint& OutStartPos) const;
 
-#pragma endregion Functions
+	ALS_BaseItem* GetItemAt(int32 ContainerIndex, FIntPoint StartPos) const;
+
+	FORCEINLINE TArray<FLS_InventoryContainer> GetContainers() const { return Containers; }
+
+	#pragma endregion Functions
 };
 

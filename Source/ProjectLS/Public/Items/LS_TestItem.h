@@ -6,6 +6,8 @@
 #include "LS_BaseItem.h"
 #include "LS_TestItem.generated.h"
 
+class ALS_Character;
+
 UCLASS()
 class PROJECTLS_API ALS_TestItem : public ALS_BaseItem
 {
@@ -32,6 +34,8 @@ protected:
 	virtual void TestInteractionOptionFunction1();
 	virtual void TestInteractionOptionFunction2();
 	virtual void TestInteractionOptionFunction3();
+
+	void TakeItem(ALS_Character* Taker);
 
 public:
 	ALS_TestItem();

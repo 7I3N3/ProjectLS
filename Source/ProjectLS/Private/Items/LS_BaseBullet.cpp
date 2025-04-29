@@ -2,6 +2,8 @@
 
 
 #include "LS_BaseBullet.h"
+#include "LS_Character.h"
+#include "LS_PlayerStatusWidget.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "DrawDebugHelpers.h"
 
@@ -30,6 +32,8 @@ void ALS_BaseBullet::BeginPlay()
 	Super::BeginPlay();
 
 	PreviousLocation = GetActorLocation();
+
+	InteractionOptions.Add(TEXT("Take"), [this](ALS_Character* Interactor) { ALS_BaseBullet::Take(Interactor); });
 }
 
 void ALS_BaseBullet::Tick(float DeltaTime)
@@ -56,6 +60,13 @@ void ALS_BaseBullet::Tick(float DeltaTime)
 void ALS_BaseBullet::ExecuteInteraction(const FString& SelectedOption, APlayerController* PlayerController)
 {
 	Super::ExecuteInteraction(SelectedOption, PlayerController);
+}
+
+void ALS_BaseBullet::Take(ALS_Character* Taker)
+{
+	if (!Taker) return;
+
+	Taker->TakeItem(this);
 }
 
 void ALS_BaseBullet::ActivateBullet(FVector Direction, float Speed)

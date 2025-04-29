@@ -62,6 +62,8 @@ public:
 
 	virtual void ExecuteInteraction(const FString& SelectedOption, APlayerController* PlayerController) override;
 	
+	void Take(ALS_Character* Taker);
+
 	void ActivateBullet(FVector Direction, float Speed);
 	void DeactivateBullet();
 

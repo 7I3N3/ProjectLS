@@ -31,3 +31,8 @@ void ALS_BaseItem::ExecuteInteraction(const FString& SelectedOption, APlayerCont
 		}
 	}
 }
+
+void ALS_BaseItem::AddStack(int32 Amount)
+{
+	CurrentStackCount = FMath::Min(MaxStackCount, CurrentStackCount + Amount);
+}

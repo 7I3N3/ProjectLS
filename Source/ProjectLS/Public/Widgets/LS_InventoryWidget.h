@@ -5,8 +5,11 @@
 #include "LS_InventoryWidget.generated.h"
 
 class UCanvasPanel;
+class ULS_ItemWidget;
 class ULS_InventoryComponent;
 class ULS_InventorySlotWidget;
+
+class ALS_BaseItem;
 
 UCLASS()
 class PROJECTLS_API ULS_InventoryWidget : public UUserWidget
@@ -18,19 +21,24 @@ private:
 
 protected:
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UCanvasPanel> CanvasPanel;
+	TObjectPtr<UCanvasPanel> InventoryCanvas;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UCanvasPanel> ItemCanvas;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<ULS_InventorySlotWidget> InventorySlotWidgetClass;
+	TSubclassOf<ULS_InventorySlotWidget> SlotWidgetClass;
+
+	TArray<ULS_InventorySlotWidget*> SlotWidgets;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<ULS_ItemWidget> ItemWidgetClass;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Inventory")
 	TObjectPtr<ULS_InventoryComponent> InventoryComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
 	float SlotSize = 75.0f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
-	float SlotPadding = 2.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
 	float ContainerPadding = 4.0f;
@@ -48,10 +56,25 @@ protected:
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void SetInventoryComponent(ULS_InventoryComponent* NewComponent);
+	void InitializeInventory(ULS_InventoryComponent* NewComponent);
 
 	UFUNCTION(BlueprintCallable)
 	void RefreshInventory();
+
+	void PositionItemWidget(ULS_ItemWidget* ItemWidget, FIntPoint RootSlotCoord);
+
+	UFUNCTION(BlueprintCallable)
+	void HandleItemDrop(ULS_ItemWidget* DraggedItemWidget, const FVector2D DropPosition);
+
+	UFUNCTION(BlueprintCallable)
+	bool TakeItem(ALS_BaseItem* Item);
+
+	UFUNCTION(BlueprintCallable)
+	bool DumpItem(ALS_BaseItem* Item);
+
+	int32 FindContainerIndexAtPosition(const FVector2D& DropPosition) const;
+
+	void DebugInventory();
 
 #pragma endregion Functions
 };

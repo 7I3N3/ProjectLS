@@ -14,6 +14,7 @@
 #include "LS_BaseGun.h"
 #include "LS_InteractionMenuWidget.h"
 #include "LS_PlayerStatusWidget.h"
+#include "LS_InventoryWidget.h"
 #include "Blueprint/UserWidget.h"
 
 ALS_Character::ALS_Character()
@@ -70,7 +71,7 @@ void ALS_Character::BeginPlay()
 			PlayerStatus->AddToViewport();
 			PlayerStatus->SetVisibility(ESlateVisibility::Hidden);
 
-			PlayerStatus->SetupEquipmentAndInventories(EquippedItems);
+			UpdateStatus();
 		}
 	}
 }
@@ -259,7 +260,7 @@ bool ALS_Character::EquipItem(const TScriptInterface<ILS_Equipable>& Item)
 
 	EquippedItems.Add(SlotType, Item);
 
-	PlayerStatus->SetupEquipmentAndInventories(EquippedItems);
+	UpdateStatus();
 
 	if (SlotType == EEquipmentSlotType::ES_MainWeapon || SlotType == EEquipmentSlotType::ES_SubWeapon)
 	{
@@ -281,6 +282,29 @@ bool ALS_Character::UnequipItem(EEquipmentSlotType SlotType)
 	}
 
 	EquippedItems.Remove(SlotType);
+
+	UpdateStatus();
+
+	return true;
+}
+
+bool ALS_Character::TakeItem(ALS_BaseItem* Item)
+{
+	if (!Item) return false;
+
+	for (ULS_InventoryWidget* InventoryWidget : PlayerStatus->GetInventories())
+	{
+		if (InventoryWidget->TakeItem(Item))
+		{
+			InventoryWidget->DebugInventory();
+			return true;
+		}
+	}
+	return false;
+}
+bool ALS_Character::DumpItem(ALS_BaseItem* Item)
+{
+	if (!Item) return false;
 
 	return true;
 }
@@ -389,5 +413,13 @@ void ALS_Character::PlayerStatusToggle()
 		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 		PC->SetInputMode(InputMode);
 		PC->bShowMouseCursor = true;
+	}
+}
+
+void ALS_Character::UpdateStatus()
+{
+	if (PlayerStatus)
+	{
+		PlayerStatus->SetupEquipmentAndInventories(EquippedItems);
 	}
 }

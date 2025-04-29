@@ -22,7 +22,7 @@ protected:
 	TObjectPtr<UImage> ItemIcon;
 
 	UPROPERTY(meta = (BindWidget))
-	UBorder* BorderFrame;
+	TObjectPtr<UBorder> BorderFrame;
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> ItemNameText;
@@ -36,6 +36,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Style", meta = (AllowPrivateAccess = "true"))
 	FLinearColor HoveredColor = FLinearColor::Yellow;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
+	float SlotSize = 75.0f;
+
 public:
 
 #pragma endregion Parameters
@@ -48,15 +51,13 @@ protected:
 	virtual void NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	virtual void NativeOnMouseLeave(const FPointerEvent& InMouseEvent) override;
 
+	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation) override;
 	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void UpdateSlot(ALS_BaseItem* NewItem);
-
-	UFUNCTION(BlueprintCallable)
-	void ClearSlot();
+	void SetItem(ALS_BaseItem* NewItem);
 
 	UFUNCTION(BlueprintPure)
 	ALS_BaseItem* GetItem() const { return ItemRef; }

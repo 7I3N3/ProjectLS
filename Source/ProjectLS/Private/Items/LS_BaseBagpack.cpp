@@ -14,7 +14,6 @@ void ALS_BaseBagpack::BeginPlay()
 {
 	Super::BeginPlay();
 
-	InventoryComponent->InitializeInventory();
 	InteractionOptions.Add(TEXT("Equip"), [this](ALS_Character* Interactor) { ALS_BaseBagpack::Equip(Interactor); });
 }
 

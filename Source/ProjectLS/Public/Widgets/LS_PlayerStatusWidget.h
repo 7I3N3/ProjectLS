@@ -29,6 +29,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<ULS_InventoryWidget> InventoryWidgetClass;
 
+	TArray<ULS_InventoryWidget*> Inventories;
+
 public:
 
 
@@ -46,6 +48,8 @@ public:
 	void SetupEquipmentAndInventories(const TMap<EEquipmentSlotType, TScriptInterface<ILS_Equipable>>& EquippedItems);
 
 	ULS_PlayerEquipmentWidget* GetEquipmentWidget() const { return EquipmentWidget; }
+
+	TArray<ULS_InventoryWidget*> GetInventories() const { return Inventories; }
 
 #pragma endregion Functions
 };
