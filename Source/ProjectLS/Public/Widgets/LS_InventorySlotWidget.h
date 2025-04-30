@@ -25,8 +25,6 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Inventory")
 	FIntPoint SlotCoordinate;
 
-	int32 ContainerIndex = -1;
-
 public:
 
 #pragma endregion Parameters
@@ -44,13 +42,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	void SetSlotCoordinate(FIntPoint InCoord);
-
-	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	void SetPositionInCanvas(FVector2D Position);
-
-	void SetContainerIndex(int32 NewIndex) { ContainerIndex = NewIndex; }
-
-	int32 GetContainerIndex() const { return ContainerIndex; }
 
 #pragma endregion Functions
 };

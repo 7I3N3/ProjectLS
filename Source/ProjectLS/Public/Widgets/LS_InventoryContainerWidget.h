@@ -4,8 +4,9 @@
 #include "Blueprint/UserWidget.h"
 #include "LS_InventoryContainerWidget.generated.h"
 
-class UTextBlock;
-class UVerticalBox;
+class UBorder;
+class UCanvasPanel;
+class ULS_InventorySlotWidget;
 
 UCLASS()
 class PROJECTLS_API ULS_InventoryContainerWidget : public UUserWidget
@@ -18,10 +19,17 @@ private:
 
 protected:
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> ContainerName;
+	TObjectPtr<UBorder> BorderFrame;
 
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UVerticalBox> VerticalContainer;
+	TObjectPtr<UCanvasPanel> SlotCanvas;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<ULS_InventorySlotWidget> SlotWidgetClass;
+
+	TArray<TObjectPtr<ULS_InventorySlotWidget>> SlotWidgets;
+
+	int32 ContainerIndex = -1;
 
 public:
 
@@ -36,7 +44,9 @@ protected:
 
 
 public:
-	
+	void InitializeContainerWidget(int32 InContainerIndex, const FIntPoint GridSize, const float SlotSize);
+
+	int32 GetContainerIndex() const { return ContainerIndex; }
 
 #pragma endregion Functions
 };

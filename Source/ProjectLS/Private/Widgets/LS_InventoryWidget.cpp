@@ -1,20 +1,19 @@
 #include "LS_InventoryWidget.h"
 #include "LS_InventoryComponent.h"
+#include "LS_InventoryContainerWidget.h"
 #include "LS_ItemWidget.h"
-#include "LS_InventorySlotWidget.h"
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Components/Border.h"
-#include "Blueprint/WidgetTree.h"
 
 void ULS_InventoryWidget::InitializeInventory(ULS_InventoryComponent* NewComponent)
 {
 	InventoryComponent = NewComponent;
 
-	if (!InventoryComponent || !SlotWidgetClass) return;
+	if (!InventoryComponent || !ContainerWidgetClass) return;
 
-	InventoryCanvas->ClearChildren();
-	SlotWidgets.Empty();
+	ContainerCanvas->ClearChildren();
+	ContainerWidgets.Empty();
 
 	const TArray<FLS_InventoryContainer>& Containers = InventoryComponent->GetContainers();
 
@@ -23,36 +22,24 @@ void ULS_InventoryWidget::InitializeInventory(ULS_InventoryComponent* NewCompone
 		const FIntPoint Offset = Containers[Index].GridOffset;
 		const FIntPoint Size = Containers[Index].GridSize;
 
-		UBorder* ContainerBorder = WidgetTree->ConstructWidget<UBorder>(UBorder::StaticClass());
-		ContainerBorder->SetBrushColor(FLinearColor::Black);
-		ContainerBorder->SetPadding(FMargin(0));
-
-		UCanvasPanel* ContainerCanvas = WidgetTree->ConstructWidget<UCanvasPanel>(UCanvasPanel::StaticClass());
-		ContainerBorder->SetContent(ContainerCanvas);
-		ContainerBorder->SetBrushColor(FLinearColor(0.f, 0.f, 0.f, 0.2f));
-
-		for (int32 y = 0; y < Size.Y; y++)
+		if (ULS_InventoryContainerWidget* ContainerWidget = CreateWidget<ULS_InventoryContainerWidget>(this, ContainerWidgetClass))
 		{
-			for (int32 x = 0; x < Size.X; x++)
+			ContainerCanvas->AddChild(ContainerWidget);
+			ContainerWidget->InitializeContainerWidget(Index, Size, SlotSize);
+			ContainerWidgets.Add(ContainerWidget);
+
+			if (UCanvasPanelSlot* ContainerSlot = Cast<UCanvasPanelSlot>(ContainerWidget->Slot))
 			{
-				FIntPoint LocalGrid = FIntPoint(x, y);
-				FVector2D Pos = LocalGrid * SlotSize;
+				ContainerSlot->SetAnchors(FAnchors(0.f, 0.f));
+				ContainerSlot->SetAlignment(FVector2D(0.f, 0.f));
 
-				ULS_InventorySlotWidget* SlotWidget = CreateWidget<ULS_InventorySlotWidget>(this, SlotWidgetClass);
-				
-				SlotWidget->SetPositionInCanvas(Pos);
-				SlotWidget->SetSlotCoordinate(LocalGrid);
+				FVector2D ContainerSize = FVector2D(Size) * SlotSize + ContainerBorder;
+				FVector2D ContainerPosition = FVector2D(Offset) * SlotSize + ContainerBorder * 2.0f + ContainerPadding * 2.0f;
 
-				SlotWidget->SetContainerIndex(Index);
-
-				ContainerCanvas->AddChild(SlotWidget);
-				SlotWidgets.Add(SlotWidget);
+				ContainerSlot->SetSize(ContainerSize); 
+				ContainerSlot->SetPosition(ContainerPosition);
 			}
 		}
-
-		UCanvasPanelSlot* ContainerBorderSlot = InventoryCanvas->AddChildToCanvas(ContainerBorder);
-		ContainerBorderSlot->SetPosition(FVector2D(Offset) * SlotSize);
-		ContainerBorderSlot->SetSize(FVector2D(Size) * SlotSize);
 	}
 }
 
@@ -103,23 +90,23 @@ void ULS_InventoryWidget::HandleItemDrop(ULS_ItemWidget* DraggedItemWidget, cons
 {
 	if (!DraggedItemWidget || !InventoryComponent) return;
 
-	ULS_InventorySlotWidget* TargetSlot = nullptr;
+	ULS_InventoryContainerWidget* TargetContainer = nullptr;
 
-	for (ULS_InventorySlotWidget* InventorySlot : SlotWidgets)
+	for (ULS_InventoryContainerWidget* Container : ContainerWidgets)
 	{
-		if (InventorySlot && InventorySlot->IsHovered())
+		if (Container && Container->IsHovered())
 		{
-			TargetSlot = InventorySlot;
+			TargetContainer = Container;
 			break;
 		}
 	}
 
-	if (TargetSlot)
+	if (TargetContainer)
 	{
 		const int32 GridX = FMath::FloorToInt(DropPosition.X / SlotSize);
 		const int32 GridY = FMath::FloorToInt(DropPosition.Y / SlotSize);
 
-		const int32 ContainerIndex = TargetSlot->GetContainerIndex();
+		const int32 ContainerIndex = TargetContainer->GetContainerIndex();
 
 		if (InventoryComponent->CanPlaceItem(DraggedItemWidget->GetItem(), ContainerIndex, GridX, GridY))
 		{

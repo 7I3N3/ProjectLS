@@ -7,7 +7,7 @@
 class UCanvasPanel;
 class ULS_ItemWidget;
 class ULS_InventoryComponent;
-class ULS_InventorySlotWidget;
+class ULS_InventoryContainerWidget;
 
 class ALS_BaseItem;
 
@@ -21,15 +21,15 @@ private:
 
 protected:
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UCanvasPanel> InventoryCanvas;
+	TObjectPtr<UCanvasPanel> ContainerCanvas;
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UCanvasPanel> ItemCanvas;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<ULS_InventorySlotWidget> SlotWidgetClass;
+	TSubclassOf<ULS_InventoryContainerWidget> ContainerWidgetClass;
 
-	TArray<ULS_InventorySlotWidget*> SlotWidgets;
+	TArray<TObjectPtr<ULS_InventoryContainerWidget>> ContainerWidgets;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<ULS_ItemWidget> ItemWidgetClass;
@@ -38,10 +38,13 @@ protected:
 	TObjectPtr<ULS_InventoryComponent> InventoryComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
-	float SlotSize = 75.0f;
+	float SlotSize = 100.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
 	float ContainerPadding = 4.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
+	float ContainerBorder = 4.0f;
 
 public:
 
