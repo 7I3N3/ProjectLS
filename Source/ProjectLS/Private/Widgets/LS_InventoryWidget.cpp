@@ -1,6 +1,7 @@
 #include "LS_InventoryWidget.h"
 #include "LS_InventoryComponent.h"
 #include "LS_InventoryContainerWidget.h"
+#include "LS_InventorySlotWidget.h"
 #include "LS_ItemWidget.h"
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
@@ -45,44 +46,22 @@ void ULS_InventoryWidget::InitializeInventory(ULS_InventoryComponent* NewCompone
 
 void ULS_InventoryWidget::RefreshInventory()
 {
-	if (!InventoryComponent || !ItemWidgetClass) return;
-
-	ItemCanvas->ClearChildren();
+	if (!InventoryComponent) return;
 
 	const TArray<FLS_InventoryContainer>& Containers = InventoryComponent->GetContainers();
 
-	for (const FLS_InventoryContainer& Container : Containers)
+	for (int32 ContainerIndex = 0; ContainerIndex < Containers.Num(); ++ContainerIndex)
 	{
-		for (int32 Index = 0; Index < Container.InventorySlots.Num(); ++Index)
+		const FLS_InventoryContainer& Container = Containers[ContainerIndex];
+
+		for (int32 SlotIndex = 0; SlotIndex < Container.InventorySlots.Num(); ++SlotIndex)
 		{
-			const FLS_InventorySlot& InventorySlot = Container.InventorySlots[Index];
+			const FLS_InventorySlot& InventorySlot = Container.InventorySlots[SlotIndex];
 
-			if (InventorySlot.OccupyingItem && Container.IsRootSlot(Index))
-			{
-				ALS_BaseItem* Item = InventorySlot.OccupyingItem;
-				FIntPoint GridSize = Item->GetItemSize();
+			ULS_InventorySlotWidget* SlotWidget = ContainerWidgets[ContainerIndex]->GetItemSlotWidgets()[SlotIndex];
 
-				ULS_ItemWidget* NewWidget = CreateWidget<ULS_ItemWidget>(this, ItemWidgetClass);
-				NewWidget->SetItem(Item);
-
-				FIntPoint RootCoord = Container.GetSlotWorldPosition(Index);
-				PositionItemWidget(NewWidget, RootCoord);
-
-				ItemCanvas->AddChild(NewWidget);
-			}
+			SlotWidget->InitializeSlotWidget(InventorySlot, SlotSize);
 		}
-	}
-}
-
-void ULS_InventoryWidget::PositionItemWidget(ULS_ItemWidget* ItemWidget, FIntPoint RootSlotCoord)
-{
-	if (!ItemWidget) return;
-
-	FVector2D CanvasPos = FVector2D(RootSlotCoord.X * SlotSize, RootSlotCoord.Y * SlotSize);
-	UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(ItemWidget->Slot);
-	if (CanvasSlot)
-	{
-		CanvasSlot->SetPosition(CanvasPos);
 	}
 }
 
@@ -150,7 +129,15 @@ void ULS_InventoryWidget::DebugInventory()
 
 				if (Container.InventorySlots.IsValidIndex(Index))
 				{
-					UE_LOG(LogTemp, Log, TEXT("Inventory (%d, %d): %s"), x, y, *Container.InventorySlots[Index].OccupyingItem->GetName());
+					const auto& InventorySlot = Container.InventorySlots[Index];
+					if (InventorySlot.OccupyingItem)
+					{
+						UE_LOG(LogTemp, Log, TEXT("Inventory (%d, %d): %s"), x, y, *InventorySlot.OccupyingItem->GetName());
+					}
+					else
+					{
+						UE_LOG(LogTemp, Log, TEXT("Inventory (%d, %d): Empty"), x, y);
+					}
 				}
 			}
 		}

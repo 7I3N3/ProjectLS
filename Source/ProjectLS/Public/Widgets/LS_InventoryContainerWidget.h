@@ -48,5 +48,7 @@ public:
 
 	int32 GetContainerIndex() const { return ContainerIndex; }
 
+	TArray<ULS_InventorySlotWidget*> GetItemSlotWidgets() const { return SlotWidgets; }
+
 #pragma endregion Functions
 };

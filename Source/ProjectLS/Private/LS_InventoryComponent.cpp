@@ -86,6 +86,10 @@ bool ULS_InventoryComponent::FindPlacement(ALS_BaseItem* Item, int32& OutContain
 					OutStartPos = Pos;
 					return true;
 				}
+				else
+				{
+					UE_LOG(LogTemp, Log, TEXT("Cannot place item at Container[%d] Pos: (%d, %d)"), i, x, y);
+				}
 			}
 		}
 	}

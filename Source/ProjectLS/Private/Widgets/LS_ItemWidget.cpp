@@ -9,20 +9,13 @@
 #include "Components/CanvasPanelSlot.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 
-void ULS_ItemWidget::SetItem(ALS_BaseItem* NewItem)
+void ULS_ItemWidget::InitializeItemWidget(ALS_BaseItem* NewItem)
 {
 	ItemRef = NewItem;
 
 	if (ItemRef)
 	{
 		ItemIcon->SetBrushFromTexture(ItemRef->GetIcon());
-
-		FVector2D Size = FVector2D(
-			ItemRef->GetItemSize().X * SlotSize,
-			ItemRef->GetItemSize().Y * SlotSize
-		);
-		SetDesiredSizeInViewport(Size);
-		SetRenderTransformPivot(FVector2D(0.f, 0.f));
 	}
 }
 

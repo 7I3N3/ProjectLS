@@ -57,7 +57,7 @@ protected:
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void SetItem(ALS_BaseItem* NewItem);
+	void InitializeItemWidget(ALS_BaseItem* NewItem);
 
 	UFUNCTION(BlueprintPure)
 	ALS_BaseItem* GetItem() const { return ItemRef; }

@@ -28,7 +28,18 @@ void ALS_BaseGun::BeginPlay()
 
 void ALS_BaseGun::Take(ALS_Character* Interactor)
 {
-	// add inventory
+	if (!Interactor) return;
+
+	if (Interactor->TakeItem(this))
+	{
+		UE_LOG(LogTemp, Log, TEXT("Success Take Item"));
+		if (ItemMesh)
+		{
+			SkeletalMesh->SetVisibility(false);
+			ItemMesh->SetSimulatePhysics(false);
+			ItemMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		}
+	}
 }
 
 void ALS_BaseGun::Examine(ALS_Character* Interactor)

@@ -51,8 +51,16 @@ struct FLS_InventoryContainer
 			for (int32 x = 0; x < Item->GetItemSize().X; ++x)
 			{
 				int32 Index = GetIndex({ StartPosX + x, StartPosY + y });
-				if (!InventorySlots.IsValidIndex(Index) || InventorySlots[Index].OccupyingItem)
+				if (!InventorySlots.IsValidIndex(Index))
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Invalid slot index at (%d, %d)"), StartPosX + x, StartPosY + y);
 					return false;
+				}
+				else if (InventorySlots[Index].OccupyingItem)
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Slot at (%d, %d) already occupied"), StartPosX + x, StartPosY + y);
+					return false;
+				}
 			}
 		}
 		return true;

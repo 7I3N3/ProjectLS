@@ -23,16 +23,10 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UCanvasPanel> ContainerCanvas;
 
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UCanvasPanel> ItemCanvas;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<ULS_InventoryContainerWidget> ContainerWidgetClass;
 
 	TArray<TObjectPtr<ULS_InventoryContainerWidget>> ContainerWidgets;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<ULS_ItemWidget> ItemWidgetClass;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Inventory")
 	TObjectPtr<ULS_InventoryComponent> InventoryComponent;
@@ -63,8 +57,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void RefreshInventory();
-
-	void PositionItemWidget(ULS_ItemWidget* ItemWidget, FIntPoint RootSlotCoord);
 
 	UFUNCTION(BlueprintCallable)
 	void HandleItemDrop(ULS_ItemWidget* DraggedItemWidget, const FVector2D DropPosition);
